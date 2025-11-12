@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev":"node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js"
   },
   "keywords": [],
   "type": "module",
@@ -15,6 +16,7 @@
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "green-hub": "file:..",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.10.1"
   }
