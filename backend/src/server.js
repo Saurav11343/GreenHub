@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.routes.js";
 import { connectDB } from "./lib/db.js";
+import { seedRoles } from "./utils/seedRole.js";
 
 import { ENV } from "./lib/env.js";
 
@@ -26,7 +27,8 @@ if (ENV.NODE_ENV == "production") {
   });
 }
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log("Server running on port : " + PORT);
-  connectDB();
+  await connectDB();
+  await seedRoles();
 });

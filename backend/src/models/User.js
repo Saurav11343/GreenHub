@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    first_name: {
+    firstName: {
       type: String,
       required: true,
       trim: true,
     },
-    last_name: {
+    lastName: {
       type: String,
       required: true,
       trim: true,
@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    role_id: {
+    roleId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Role",
       required: true,

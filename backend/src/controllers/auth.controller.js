@@ -2,87 +2,131 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../lib/utils.js";
 import cloudinary from "../lib/cloudinary.js";
+import { success } from "zod";
+import {
+  loginValidationSchema,
+  signupValidationSchema,
+} from "../../../shared/validations/user.validation.js";
 
 export const signup = async (req, res) => {
-  const { fullName, email, password } = req.body;
-
   try {
-    if (!fullName || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    //validating using zod
+    const validation = signupValidationSchema.safeParse(req.body);
+
+    if (!validation.success) {
+      return res.status(400).json({
+        success: false,
+        errors: validation.error.flatten().fieldErrors,
+      });
     }
 
-    if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 6 charaters" });
-    }
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      phone,
+      address,
+      profilePic,
+      roleId,
+    } = validation.data;
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invaild email format" });
-    }
+    //checking for existing user
+    const existingUser = await User.findOne({ email });
+    if (existingUser)
+      return res.status(400).json({
+        success: false,
+        message: "Email already exists",
+      });
 
-    const user = await User.findOne({ email });
-    if (user) return res.status(400).json({ message: "Email already exist" });
-
+    //hashing password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    //creating new user
     const newUser = new User({
-      fullName,
+      firstName,
+      lastName,
       email,
       password: hashedPassword,
+      phone,
+      address,
+      profilePic,
+      roleId,
     });
 
-    if (newUser) {
-      // generateToken(newUser._id, res);
-      // await newUser.save();
+    //saving new user
+    const savedUser = await newUser.save();
 
-      const savedUser = await newUser.save();
-      generateToken(savedUser._id, res);
+    //generating jwt token
+    generateToken(savedUser._id, res);
 
-      res.status(201).json({
-        _id: newUser._id,
-        fullName: newUser.fullName,
-        email: newUser.email,
-        profilePic: newUser.profilePic,
-      });
-    } else {
-      res.status(400).json({ message: "Invaild user data" });
-    }
+    res.status(201).json({
+      success: true,
+      message: "User Created successfully",
+      user: {
+        _id: savedUser._id,
+        firstName: savedUser.firstName,
+        lastName: savedUser.lastName,
+        email: savedUser.email,
+        profilePic: savedUser.profilePic,
+        roleId: savedUser.roleId,
+      },
+    });
   } catch (error) {
-    console.log("Error in signup controller: ", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.log("Error in signup Controller", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required" });
-  }
-
   try {
+    const validation = loginValidationSchema.safeParse(req.body);
+
+    if (!validation.success) {
+      return res.status(400).json({
+        success: false,
+        errors: validation.error.flatten().fieldErrors,
+      });
+    }
+
+    const { email, password } = validation.data;
+
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invaild Credentials" });
+    if (!user)
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Credentials",
+      });
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) {
-      return res.status(400).json({ message: "Invaild Credentials" });
-    }
+    if (!isPasswordCorrect)
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Credentials",
+      });
 
     generateToken(user._id, res);
 
     res.status(200).json({
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      profilePic: user.profilePic,
+      success: true,
+      message: "Welcome " + user.firstName + " " + user.lastName,
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        profilePic: user.profilePic,
+      },
     });
   } catch (error) {
-    console.error("Error in login controller", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.log("Error in login auth.contoller", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
