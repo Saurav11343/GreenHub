@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 
 import authRoutes from "./routes/auth.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
+import plantRoutes from "./routes/plant.routes.js";
+
 import { connectDB } from "./lib/db.js";
 import { seedRoles } from "./utils/seedRole.js";
 
@@ -20,6 +22,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
+app.use("/api/plant", plantRoutes);
 
 if (ENV.NODE_ENV == "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));

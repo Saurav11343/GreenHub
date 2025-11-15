@@ -35,7 +35,7 @@ export const createCategory = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Category created successfully",
-      Category: newCategory,
+      data: newCategory,
     });
   } catch (error) {
     console.log("Error in createCategory controller: ", error);
@@ -53,7 +53,7 @@ export const getAllCategory = async (req, res) => {
     return res.status(200).json({
       success: true,
       total: categories.length,
-      categories,
+      data: categories,
     });
   } catch (error) {
     console.log("Error in getAllCategory controller", error);
@@ -87,7 +87,7 @@ export const getCategoryById = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      category,
+      data: category,
     });
   } catch (error) {
     console.log("Error in getCategoryById controller: ", error);
@@ -145,7 +145,7 @@ export const updateCategory = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Category updated successfully",
-      category: updateCategory,
+      data: updateCategory,
     });
   } catch (error) {
     console.log("Error in updateCategory controller:", error);
