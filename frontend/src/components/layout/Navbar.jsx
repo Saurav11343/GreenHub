@@ -3,11 +3,13 @@ import AdminNavbar from "./AdminNavbar";
 import CustomerNavbar from "./CustomerNavbar";
 import { useAuthStore } from "../../store/useAuthStore";
 import DefaultNavbar from "./DefaultNavbar";
-function navbar() {
+function Navbar() {
   const authUser = useAuthStore((state) => state.authUser);
   if (!authUser) return <DefaultNavbar />;
 
-  return <>{authUser.roleName === "Admin" ? <AdminNavbar /> : <CustomerNavbar />}</>;
+  return (
+    <>{authUser.roleName === "Admin" ? <AdminNavbar /> : <CustomerNavbar />}</>
+  );
 }
 
-export default navbar;
+export default Navbar;

@@ -13,7 +13,7 @@ function HeroSection() {
     >
       {/* Overlay for readability */}
       <div className="absolute inset-0 bg-black/50"></div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
+      <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/30 to-transparent"></div>
 
       {/* Text Content */}
       <div className="hero-content text-neutral-content text-center relative z-10 px-6">
