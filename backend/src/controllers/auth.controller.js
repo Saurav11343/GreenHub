@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "../lib/utils.js";
 import cloudinary from "../lib/cloudinary.js";
 import { success } from "zod";
+import Role from "../models/Role.js";
 import {
   loginValidationSchema,
   signupValidationSchema,
@@ -28,7 +29,7 @@ export const signup = async (req, res) => {
       phone,
       address,
       profilePic,
-      roleId,
+      roleName,
     } = validation.data;
 
     //checking for existing user
@@ -38,6 +39,15 @@ export const signup = async (req, res) => {
         success: false,
         message: "Email already exists",
       });
+
+    const role = await Role.findOne({ roleName });
+    if (!role) {
+      return res.status(400).json({
+        success: false,
+        message: "invalid role",
+      });
+    }
+    const roleId = role._id;
 
     //hashing password
     const salt = await bcrypt.genSalt(10);
@@ -58,20 +68,12 @@ export const signup = async (req, res) => {
     //saving new user
     const savedUser = await newUser.save();
 
-    //generating jwt token
-    generateToken(savedUser._id, res);
+    // //generating jwt token
+    // generateToken(savedUser._id, res);
 
     res.status(201).json({
       success: true,
       message: "User Created successfully",
-      user: {
-        _id: savedUser._id,
-        firstName: savedUser.firstName,
-        lastName: savedUser.lastName,
-        email: savedUser.email,
-        profilePic: savedUser.profilePic,
-        roleId: savedUser.roleId,
-      },
     });
   } catch (error) {
     console.log("Error in signup Controller", error);
@@ -95,7 +97,7 @@ export const login = async (req, res) => {
 
     const { email, password } = validation.data;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("roleId");
     if (!user)
       return res.status(400).json({
         success: false,
@@ -119,6 +121,7 @@ export const login = async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         profilePic: user.profilePic,
+        roleName: user.roleId.roleName,
       },
     });
   } catch (error) {
@@ -132,7 +135,7 @@ export const login = async (req, res) => {
 
 export const logout = async (_, res) => {
   res.cookie("jwt", "", { maxAge: 0 });
-  res.status(200).json({ message: "logged out successfully" });
+  res.status(200).json({ success: true, message: "logged out successfully" });
 };
 
 export const updateProfile = async (req, res) => {

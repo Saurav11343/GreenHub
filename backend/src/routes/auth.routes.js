@@ -17,7 +17,10 @@ router.post("/login", login);
 router.post("/logout", logout);
 
 router.get("/check", protectRoute, (req, res) =>
-  res.status(200).json(req.user)
+  res.status(200).json({
+    success: true,
+    user: req.user,
+  })
 );
 
 router.put("/update-profile", protectRoute, updateProfile);

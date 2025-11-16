@@ -1,9 +1,14 @@
-import React from 'react'
+import React from "react";
+import Navbar from "../../components/layout/navbar";
+import SignupComponent from "../../components/page/signup/SignupComponent";
 
 function SignupPage() {
   return (
-    <div>SignupPage</div>
-  )
+    <div>
+      <Navbar />
+      <SignupComponent />
+    </div>
+  );
 }
 
-export default SignupPage
+export default SignupPage;
