@@ -1,10 +1,10 @@
 import React from "react";
-import CustomerNavbar from "../../components/layout/CustomerNavbar";
+import Navbar from "../../components/layout/navbar";
 
 function CustomerPage() {
   return (
     <div>
-      <CustomerNavbar />
+      <Navbar/>
     </div>
   );
 }
