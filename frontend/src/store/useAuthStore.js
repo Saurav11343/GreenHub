@@ -40,7 +40,7 @@ export const useAuthStore = create((set) => ({
     try {
       set({ loading: true });
       const response = await axiosInstance.post("/auth/login", data);
-      set({ authUser: response.data });
+      set({ authUser: response.data.user });
       return response.data;
     } catch (err) {
       if (err.response) return err.response.data;

@@ -1,12 +1,7 @@
 import React from "react";
-import NavbarD from "../../components/layout/NavbarD";
 
 function CustomerPage() {
-  return (
-    <div>
-      <NavbarD />
-    </div>
-  );
+  return <div>this is customer page</div>;
 }
 
 export default CustomerPage;

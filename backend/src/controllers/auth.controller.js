@@ -138,6 +138,36 @@ export const logout = async (_, res) => {
   res.status(200).json({ success: true, message: "logged out successfully" });
 };
 
+export const checkAuth = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).populate("roleId");
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        profilePic: user.profilePic,
+        roleName: user.roleId.roleName,
+      },
+    });
+  } catch (error) {
+    console.log("Error in checkAuth:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 export const updateProfile = async (req, res) => {
   try {
     const { profilePic } = req.body;
