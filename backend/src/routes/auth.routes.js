@@ -2,6 +2,7 @@ import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
 import {
+  checkAuth,
   login,
   logout,
   signup,
@@ -16,12 +17,7 @@ router.post("/login", login);
 
 router.post("/logout", logout);
 
-router.get("/check", protectRoute, (req, res) =>
-  res.status(200).json({
-    success: true,
-    user: req.user,
-  })
-);
+router.get("/check", protectRoute, checkAuth);
 
 router.put("/update-profile", protectRoute, updateProfile);
 

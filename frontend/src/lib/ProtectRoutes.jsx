@@ -1,22 +1,17 @@
 import React from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navigate } from "react-router";
+import { Navigate, Outlet } from "react-router";
 
-function ProtectRoutes({ children, allowedRoles }) {
-  const authUser = useAuthStore((state) => state.authUser);
-  console.log("Auth user in Protect route: ", authUser);
+function ProtectRoutes({ allowedRoles }) {
+  const { authUser } = useAuthStore();
 
-  if (!authUser) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!authUser) return <Navigate to="/login" />;
 
-  const role = authUser.user?.roleName;
-
-  if (!allowedRoles.includes(role)) {
+  if (!allowedRoles.includes(authUser.roleName)) {
     return <Navigate to="/" replace />;
   }
 
-  return children;
+  return <Outlet />;
 }
 
 export default ProtectRoutes;

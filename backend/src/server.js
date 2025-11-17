@@ -9,6 +9,7 @@ import categoryRoutes from "./routes/category.routes.js";
 import plantRoutes from "./routes/plant.routes.js";
 import cartItemRoutes from "./routes/cartItem.routes.js";
 import orderRoutes from "./routes/order.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
 
 import { connectDB } from "./lib/db.js";
 import { seedRoles } from "./utils/seedRole.js";
@@ -29,6 +30,7 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/plant", plantRoutes);
 app.use("/api/cartItem", cartItemRoutes);
 app.use("/api/order", orderRoutes);
+app.use("/api/upload", uploadRoutes);
 
 if (ENV.NODE_ENV == "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));

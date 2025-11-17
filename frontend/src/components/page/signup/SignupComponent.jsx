@@ -4,8 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signupValidationSchema } from "../../../../../shared/validations/user.validation.js";
 import { useAuthStore } from "../../../store/useAuthStore.js";
 
-import InputField from "../../form/InputField";
-import ButtonLoader from "../../form/ButtonLoader";
+import InputField from "../../common/InputField.jsx";
+import FormField from "../../common/FormField.jsx";
+import ButtonLoader from "../../common/ButtonLoader.jsx";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 
@@ -39,7 +40,7 @@ function SignupComponent() {
   };
 
   return (
-    <div className="hero bg-base-200 min-h-[calc(100vh-64px)]">
+    <div className="hero bg-base-200 min-h-screen">
       <div className="hero-content flex-col lg:flex-row-reverse">
         {/* LEFT TEXT SECTION */}
         <div className="text-center lg:text-left max-w-md">
@@ -47,6 +48,13 @@ function SignupComponent() {
           <p className="py-6 text-base">
             Join GreenHub today and explore a wide range of healthy, beautiful
             plants delivered fresh to your home.
+            <br />
+            <button
+              onClick={() => navigate("/")}
+              className="link link-primary text-sm"
+            >
+              ← Back to Home
+            </button>
           </p>
         </div>
 
@@ -58,7 +66,7 @@ function SignupComponent() {
               <input type="hidden" value="Customer" {...register("roleName")} />
 
               {/* FIRST NAME */}
-              <InputField
+              <FormField
                 label="First Name"
                 register={register}
                 registerName="firstName"
@@ -67,7 +75,7 @@ function SignupComponent() {
               />
 
               {/* LAST NAME */}
-              <InputField
+              <FormField
                 label="Last Name"
                 register={register}
                 registerName="lastName"
@@ -76,7 +84,7 @@ function SignupComponent() {
               />
 
               {/* EMAIL */}
-              <InputField
+              <FormField
                 type="email"
                 label="Email"
                 register={register}
@@ -86,7 +94,7 @@ function SignupComponent() {
               />
 
               {/* PASSWORD */}
-              <InputField
+              <FormField
                 type="password"
                 label="Password"
                 register={register}
@@ -96,7 +104,7 @@ function SignupComponent() {
               />
 
               {/* CONFIRM PASSWORD */}
-              <InputField
+              <FormField
                 type="password"
                 label="Confirm Password"
                 register={register}

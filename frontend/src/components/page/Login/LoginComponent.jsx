@@ -1,11 +1,12 @@
 import React from "react";
-import ButtonLoader from "../../form/ButtonLoader.jsx";
-import InputField from "../../form/InputField.jsx";
+import ButtonLoader from "../../common/ButtonLoader.jsx";
+import InputField from "../../common/InputField.jsx";
 import { useAuthStore } from "../../../store/useAuthStore.js";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginValidationSchema } from "../../../../../shared/validations/user.validation.js";
+import FormField from "../../common/FormField.jsx";
 import toast from "react-hot-toast";
 
 function LoginComponent() {
@@ -46,7 +47,7 @@ function LoginComponent() {
   return (
     <div>
       {/* HERO SECTION */}
-      <div className="hero bg-base-200 min-h-[calc(100vh-64px)]">
+      <div className="hero bg-base-200 min-h-screen">
         <div className="hero-content flex-col lg:flex-row-reverse">
           {/* LEFT CONTENT */}
           <div className="text-center lg:text-left max-w-md">
@@ -54,6 +55,13 @@ function LoginComponent() {
             <p className="py-6 text-base">
               Login to continue exploring and buying fresh, beautiful plants
               from GreenHub.
+              <br />
+              <button
+                onClick={() => navigate("/")}
+                className="link link-primary text-sm"
+              >
+                ← Back to Home
+              </button>
             </p>
           </div>
 
@@ -62,17 +70,17 @@ function LoginComponent() {
             <div className="card-body">
               <form onSubmit={handleSubmit(onSubmit)} className="w-full">
                 {/* EMAIL */}
-                <InputField
+                <FormField
                   type="email"
                   label="Email"
                   register={register}
                   registerName="email"
-                  placeholder="mail@example.com"
                   error={errors.email}
+                  placeholder="mail@example.com"
                 />
 
                 {/* PASSWORD */}
-                <InputField
+                <FormField
                   type="password"
                   label="Password"
                   register={register}

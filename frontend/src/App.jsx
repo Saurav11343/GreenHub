@@ -6,8 +6,12 @@ import SignupPage from "./pages/auth/SignupPage";
 import { useAuthStore } from "./store/useAuthStore";
 import PageLoader from "./components/loader/PageLoader";
 import CustomerPage from "./pages/customer/CustomerPage";
-import AdminPage from "./pages/admin/AdminPage";
 import ProtectRoutes from "./lib/ProtectRoutes";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import RootLayout from "./components/layout/layouts/RootLayout";
+import AdminLayout from "./components/layout/layouts/AdminLayout";
+import ManageCategories from "./pages/admin/ManageCategories";
+import TestUpload from "./pages/TestUpload";
 
 function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -24,29 +28,30 @@ function App() {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/test-upload" element={<TestUpload />} />
+
+        {/* AUTH PAGES (NO NAVBAR) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        {/* <Route path="/customer" element={<CustomerPage />} />
-        <Route path="/admin" element={<AdminPage />} /> */}
 
-        <Route
-          path="/customer"
-          element={
-            <ProtectRoutes allowedRoles={["Customer"]}>
-              <CustomerPage />
-            </ProtectRoutes>
-          }
-        />
+        {/* PUBLIC + CUSTOMER ROUTES WITH WEBSITE LAYOUT */}
+        <Route element={<RootLayout />}>
+          {/* Public pages */}
+          <Route path="/" element={<HomePage />} />
 
-        <Route
-          path="/admin"
-          element={
-            <ProtectRoutes allowedRoles={["Admin"]}>
-              <AdminPage />
-            </ProtectRoutes>
-          }
-        />
+          {/* Customer protected pages */}
+          <Route element={<ProtectRoutes allowedRoles={["Customer"]} />}>
+            <Route path="/customer" element={<CustomerPage />} />
+          </Route>
+        </Route>
+
+        {/* ADMIN ROUTES WITH ADMIN LAYOUT */}
+        <Route element={<ProtectRoutes allowedRoles={["Admin"]} />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/categories" element={<ManageCategories />} />
+          </Route>
+        </Route>
       </Routes>
     </div>
   );
