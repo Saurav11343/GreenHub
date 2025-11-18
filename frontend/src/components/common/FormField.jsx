@@ -51,7 +51,7 @@ function FormField({
             as === "textarea"
               ? "textarea textarea-bordered"
               : "input input-bordered"
-          } w-full ${error ? "input-error textarea-error" : ""}`}
+          } w-full ${error ? "input-error " : ""}`}
         />
       )}
 
