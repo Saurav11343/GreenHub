@@ -11,7 +11,6 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import RootLayout from "./components/layout/layouts/RootLayout";
 import AdminLayout from "./components/layout/layouts/AdminLayout";
 import ManageCategories from "./pages/admin/ManageCategories";
-import TestUpload from "./pages/TestUpload";
 
 function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
