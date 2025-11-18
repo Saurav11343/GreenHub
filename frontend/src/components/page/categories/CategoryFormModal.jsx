@@ -6,9 +6,8 @@ import FormField from "../../common/FormField.jsx";
 import { createCategorySchema } from "../../../../../shared/validations/category.validation.js";
 import { useUploadStore } from "../../../store/useUploadStore.js";
 import { useImageCompression } from "../../../utils/useImageCompression.js";
-import ImageUpload from "../../common/imageUpload.jsx";
 import ButtonLoader from "../../common/ButtonLoader.jsx";
-
+import ImageUpload from "../../common/UploadImage.jsx";
 function CategoryFormModal({ isOpen, onClose, onSubmit, initialData, type }) {
   const { uploadImage } = useUploadStore();
   const { compressImage } = useImageCompression();
