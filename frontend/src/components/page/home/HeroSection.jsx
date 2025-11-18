@@ -1,5 +1,5 @@
 import React from "react";
-import HeroBgImage from "../../../assets/heroBackgroundImage.jpg";
+import HeroBgImage from "../../../assets/heroBackgroundImage.webp";
 
 function HeroSection() {
   return (

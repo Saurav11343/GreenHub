@@ -195,7 +195,7 @@ function CustomerNavbar() {
               className="btn btn-ghost btn-circle avatar"
             >
               <div className="w-10 rounded-full">
-                <img alt="profile" src="/avatar.png" />
+                <img alt="profile" src="/avatar.webp" />
               </div>
             </div>
 
