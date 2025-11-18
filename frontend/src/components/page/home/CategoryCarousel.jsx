@@ -1,29 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
 
 import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
 
-import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import CategoryCard from "../../ui/CategoryCard";
+import { useCategoryStore } from "../../../store/useCategoryStore";
 
 function CategoryCarousel() {
-  const [categories, setCategories] = useState([]);
+  const { categories, getAllCategories, loading } = useCategoryStore();
 
   useEffect(() => {
-    // TEMP HARDCODED DATA (REMOVE WHEN BACKEND READY)
-    const tempCategories = [
-      { _id: "1", name: "Indoor Plants", icon: "TreePalm" },
-      { _id: "2", name: "Outdoor Plants", icon: "Leaf" },
-      { _id: "3", name: "Succulents", icon: "Sprout" },
-      { _id: "4", name: "Flowering Plants", icon: "Flower" },
-      { _id: "5", name: "Cactus", icon: "Cactus" }, // lucide supports cactus icon
-      { _id: "6", name: "Herbs", icon: "Basil" }, // optional (fallback to Leaf)
-    ];
-
-    setCategories(tempCategories);
-  }, []);
+    getAllCategories();
+  }, [getAllCategories]);
 
   return (
     <section className="py-12 bg-base-100">
@@ -32,28 +21,48 @@ function CategoryCarousel() {
       </h2>
 
       <div className="container mx-auto px-6">
-        <Swiper
-          slidesPerView={4}
-          spaceBetween={20}
-          loop={true}
-          autoplay={{
-            delay: 2000,
-            disableOnInteraction: false,
-          }}
-          pagination={false}
-          modules={[Autoplay, Pagination, Navigation]}
-          breakpoints={{
-            320: { slidesPerView: 2, spaceBetween: 10 },
-            640: { slidesPerView: 3, spaceBetween: 15 },
-            1024: { slidesPerView: 4, spaceBetween: 20 },
-          }}
-        >
-          {categories.map((cat) => (
-            <SwiperSlide key={cat._id}>
-              <CategoryCard name={cat.name} icon={cat.icon} />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        {/* Loading placeholder */}
+        {loading && (
+          <p className="text-center opacity-70 text-sm">
+            Loading categories...
+          </p>
+        )}
+
+        {/* Empty state */}
+        {!loading && categories.length === 0 && (
+          <p className="text-center opacity-70 text-sm">
+            No categories available
+          </p>
+        )}
+
+        {/* Category Carousel */}
+        {!loading && categories.length > 0 && (
+          <Swiper
+            slidesPerView={4}
+            spaceBetween={20}
+            loop={true}
+            autoplay={{
+              delay: 2500,
+              disableOnInteraction: false,
+            }}
+            modules={[Autoplay]}
+            breakpoints={{
+              320: { slidesPerView: 2, spaceBetween: 10 },
+              640: { slidesPerView: 3, spaceBetween: 15 },
+              1024: { slidesPerView: 4, spaceBetween: 20 },
+            }}
+          >
+            {categories.map((cat) => (
+              <SwiperSlide key={cat._id}>
+                <CategoryCard
+                  name={cat.name}
+                  icon={cat.icon}
+                  image={cat.imageUrl || "/plant.webp"} // fallback image
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
       </div>
     </section>
   );

@@ -1,14 +1,11 @@
 import React from "react";
 import { Pencil, Trash2 } from "lucide-react";
 
-function CategoryTable({ data, onEdit, onDelete }) {
+function CategoryTable({ data = [], onEdit, onDelete }) {
   return (
     <div
-      className="
-        overflow-x-auto bg-base-100 rounded-xl shadow
-        max-h-[400px] md:max-h-[470px]
-        overflow-y-auto hide-scrollbar
-      "
+      className="overflow-x-auto overflow-y-auto hide-scrollbar 
+                 bg-base-100 rounded-xl shadow max-h-[400px] md:max-h-[470px]"
     >
       <table className="table table-zebra w-full">
         <thead>
@@ -21,36 +18,49 @@ function CategoryTable({ data, onEdit, onDelete }) {
 
         <tbody>
           {data.length > 0 ? (
-            data.map((category) => (
-              <tr key={category._id}>
+            data.map((cat) => (
+              <tr key={cat._id}>
+                {/* CATEGORY COLUMN */}
                 <td>
                   <div className="flex items-center gap-3">
+                    {/* Thumbnail */}
                     <div className="avatar">
                       <div className="mask mask-squircle h-10 w-10 md:h-12 md:w-12 bg-base-300">
-                        <img src="/plant.webp" alt="Category Icon" />
+                        <img
+                          src={cat.imageUrl || "/plant.webp"}
+                          alt={cat.name}
+                          onError={(e) => (e.target.src = "/plant.webp")}
+                          className="object-cover"
+                        />
                       </div>
                     </div>
+
+                    {/* Name + Short */}
                     <div>
-                      <div className="font-bold">{category.name}</div>
-                      <div className="text-sm opacity-50">{category.short}</div>
+                      <p className="font-bold">{cat.name}</p>
+                      {cat.short && (
+                        <p className="text-sm opacity-50">{cat.short}</p>
+                      )}
                     </div>
                   </div>
                 </td>
 
-                <td className="hidden md:table-cell">{category.description}</td>
+                {/* DESCRIPTION */}
+                <td className="hidden md:table-cell">{cat.description}</td>
 
+                {/* ACTIONS */}
                 <td className="text-right">
                   <div className="flex justify-end gap-1 flex-wrap">
                     <button
                       className="btn btn-ghost btn-xs"
-                      onClick={() => onEdit(category)}
+                      onClick={() => onEdit(cat)}
                     >
                       <Pencil className="h-4 w-4" /> Edit
                     </button>
 
                     <button
                       className="btn btn-ghost btn-xs text-error"
-                      onClick={() => onDelete(category)}
+                      onClick={() => onDelete(cat)}
                     >
                       <Trash2 className="h-4 w-4" /> Delete
                     </button>

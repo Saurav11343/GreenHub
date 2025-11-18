@@ -4,7 +4,7 @@ import {
   categoryIdSchema,
 } from "../../../shared/validations/category.validation.js";
 import Category from "../models/Category.js";
-
+import cloudinary from "../lib/cloudinary.js";
 export const createCategory = async (req, res) => {
   try {
     const validation = createCategorySchema.safeParse(req.body);
@@ -100,8 +100,8 @@ export const getCategoryById = async (req, res) => {
 
 export const updateCategory = async (req, res) => {
   try {
+    // 1️⃣ Validate category ID
     const idValidation = categoryIdSchema.safeParse(req.params);
-
     if (!idValidation.success) {
       return res.status(400).json({
         success: false,
@@ -111,6 +111,7 @@ export const updateCategory = async (req, res) => {
 
     const { id } = idValidation.data;
 
+    // 2️⃣ Validate body
     const bodyValidation = updateCategorySchema.safeParse(req.body);
     if (!bodyValidation.success) {
       return res.status(400).json({
@@ -120,9 +121,19 @@ export const updateCategory = async (req, res) => {
     }
 
     const updateData = bodyValidation.data;
+
+    // 3️⃣ Check if category exists
+    const category = await Category.findById(id);
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    // 4️⃣ Prevent duplicate names
     if (updateData.name) {
       const existing = await Category.findOne({ name: updateData.name });
-
       if (existing && existing._id.toString() !== id) {
         return res.status(400).json({
           success: false,
@@ -131,27 +142,42 @@ export const updateCategory = async (req, res) => {
       }
     }
 
-    const updateCategory = await Category.findByIdAndUpdate(id, updateData, {
+    // 5️⃣ If a new image is provided → delete old one from Cloudinary
+    if (updateData.imageUrl && updateData.imageUrl !== category.imageUrl) {
+      try {
+        // Extract public_id from old image URL
+        const urlParts = category.imageUrl.split("/");
+        const fileName = urlParts.pop(); // example: abcd123.png
+        const folder = urlParts.pop(); // example: categories
+
+        const publicId = `${folder}/${fileName.split(".")[0]}`; // categories/abcd123
+
+        // Delete old image
+        const cloudRes = await cloudinary.uploader.destroy(publicId);
+
+        if (cloudRes.result !== "ok" && cloudRes.result !== "not found") {
+          console.log("Cloudinary deletion failed:", cloudRes);
+        }
+      } catch (err) {
+        console.log("❌ Error deleting old image from Cloudinary:", err);
+      }
+    }
+
+    // 6️⃣ Update category
+    const updatedCategory = await Category.findByIdAndUpdate(id, updateData, {
       new: true,
     });
-
-    if (!updateCategory) {
-      return res.status(404).json({
-        success: false,
-        message: "Category not found",
-      });
-    }
 
     return res.status(200).json({
       success: true,
       message: "Category updated successfully",
-      data: updateCategory,
+      data: updatedCategory,
     });
   } catch (error) {
-    console.log("Error in updateCategory controller:", error);
+    console.log("❌ Error in updateCategory controller:", error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Internal server error while updating category",
     });
   }
 };
@@ -176,6 +202,42 @@ export const deleteCategory = async (req, res) => {
       });
     }
 
+    let publicId = null;
+
+    try {
+      if (category.imageUrl) {
+        const urlParts = category.imageUrl.split("/");
+        const fileName = urlParts.pop(); // e.g. image123.jpg
+        const folder = urlParts.pop(); // e.g. categories
+
+        const nameWithoutExt = fileName.split(".")[0]; // image123
+        publicId = `${folder}/${nameWithoutExt}`; // categories/image123
+      }
+    } catch (err) {
+      console.log("❌ Failed to parse Cloudinary image URL:", err);
+    }
+
+    // 4️⃣ Delete image from Cloudinary
+    if (publicId) {
+      try {
+        const result = await cloudinary.uploader.destroy(publicId);
+
+        if (result.result !== "ok" && result.result !== "not found") {
+          console.log("Cloudinary destroy error:", result);
+          return res.status(500).json({
+            success: false,
+            message: "Failed to delete category image",
+            cloudinary: result,
+          });
+        }
+      } catch (cloudErr) {
+        console.log("Cloudinary deletion exception:", cloudErr);
+        return res.status(500).json({
+          success: false,
+          message: "image deletion failed",
+        });
+      }
+    }
     await Category.findByIdAndDelete(id);
 
     return res.status(200).json({
