@@ -27,7 +27,7 @@ function CategoryTable({ data, onEdit, onDelete }) {
                   <div className="flex items-center gap-3">
                     <div className="avatar">
                       <div className="mask mask-squircle h-10 w-10 md:h-12 md:w-12 bg-base-300">
-                        <img src="/plant.jpg" alt="Category Icon" />
+                        <img src="/plant.webp" alt="Category Icon" />
                       </div>
                     </div>
                     <div>
