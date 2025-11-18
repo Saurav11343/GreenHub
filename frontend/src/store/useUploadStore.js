@@ -1,53 +1,33 @@
 import { create } from "zustand";
-import { axiosInstance } from "../lib/axios";
 
 export const useUploadStore = create((set) => ({
   imageUrl: "",
   loading: false,
-  error: null,
 
-  uploadImage: async (file, folder) => {
+  uploadImage: async (file, folderName) => {
     try {
-      set({ loading: true, error: null });
-
-      if (!file) {
-        return { success: false, message: "File is required" };
-      }
-
-      if (!folder) {
-        return { success: false, message: "Folder is required" };
-      }
+      set({ loading: true });
 
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("folder", folder);
+      formData.append("folderName", folderName);
 
-      // IMPORTANT: use axiosInstance
-      const response = await axiosInstance.post("/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const res = await fetch("http://localhost:3000/api/upload", {
+        method: "POST",
+        body: formData,
       });
 
-      set({ imageUrl: response.data.imageUrl });
+      const data = await res.json();
 
-      return {
-        success: true,
-        imageUrl: response.data.imageUrl,
-      };
+      if (data.success) {
+        set({ imageUrl: data.imageUrl });
+      }
+
+      return data.imageUrl;
     } catch (err) {
-      const message = err.response?.data?.message || "Upload failed";
-
-      set({ error: message });
-
-      return {
-        success: false,
-        message,
-      };
+      console.log(err);
     } finally {
       set({ loading: false });
     }
   },
-
-  resetImage: () => set({ imageUrl: "" }),
 }));

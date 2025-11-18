@@ -7,7 +7,7 @@ import CategorySearch from "../../components/page/categories/CategorySearch";
 import CategoryTable from "../../components/page/categories/CategoryTable";
 import { universalSearch } from "../../utils/universalSearch";
 
-import { useCategoryStore } from "../../store/useCategoryStore";
+import { useCategoryStore } from "../../store/useCategoryStore.js";
 import PageLoader from "../../components/loader/PageLoader";
 import toast from "react-hot-toast";
 

@@ -2,15 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import FormField from "../../common/FormField";
+import FormField from "../../common/FormField.jsx";
 import { createCategorySchema } from "../../../../../shared/validations/category.validation.js";
+import { useUploadStore } from "../../../store/useUploadStore.js";
+import { useImageCompression } from "../../../utils/useImageCompression.js";
+import ImageUpload from "../../common/imageUpload.jsx";
+import ButtonLoader from "../../common/ButtonLoader.jsx";
 
 function CategoryFormModal({ isOpen, onClose, onSubmit, initialData, type }) {
+  const { uploadImage } = useUploadStore();
+  const { compressImage } = useImageCompression();
+
   const {
     register,
     handleSubmit,
     reset,
-    watch,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(createCategorySchema),
@@ -18,46 +25,46 @@ function CategoryFormModal({ isOpen, onClose, onSubmit, initialData, type }) {
     defaultValues: {
       name: "",
       description: "",
-      image: null,
+      imageUrl: "",
     },
   });
 
-  // For showing preview
+  const [selectedFile, setSelectedFile] = useState(null);
   const [previewImg, setPreviewImg] = useState(null);
+  const [saving, setSaving] = useState(false);
 
-  // Watch image input
-  const watchImage = watch("image");
-
-  // Create preview when image is selected
-  useEffect(() => {
-    if (watchImage && watchImage[0]) {
-      const file = watchImage[0];
-      setPreviewImg(URL.createObjectURL(file));
-    }
-  }, [watchImage]);
-
-  // Prefill form when editing
+  // Load initial data (edit mode)
   useEffect(() => {
     if (initialData) {
       reset({
         name: initialData.name,
         description: initialData.description,
-        image: null, // user will upload new image if needed
+        imageUrl: initialData.imageUrl,
       });
-
-      // load existing image (from DB)
-      setPreviewImg(initialData.imageUrl || null);
+      setPreviewImg(initialData.imageUrl);
     } else {
-      reset({
-        name: "",
-        description: "",
-        image: null,
-      });
+      reset();
       setPreviewImg(null);
     }
   }, [initialData, reset]);
 
   if (!isOpen) return null;
+
+  // ⭐ One-click submit: upload image + save category
+  const handleFinalSubmit = async (formData) => {
+    setSaving(true);
+
+    if (selectedFile) {
+      const compressed = await compressImage(selectedFile);
+      const url = await uploadImage(compressed, "categories");
+
+      formData.imageUrl = url;
+      setValue("imageUrl", url);
+    }
+
+    await onSubmit(formData);
+    setSaving(false);
+  };
 
   return (
     <dialog open className="modal">
@@ -66,57 +73,63 @@ function CategoryFormModal({ isOpen, onClose, onSubmit, initialData, type }) {
           {type === "edit" ? "Edit Category" : "Add New Category"}
         </h3>
 
-        <form className="py-4 space-y-3" onSubmit={handleSubmit(onSubmit)}>
-          {/* IMAGE UPLOAD */}
-          <FormField
-            label="Category Image"
-            as="image"
-            register={register}
-            registerName="image"
-            preview={true}
+        <form
+          className="py-4 space-y-3"
+          onSubmit={handleSubmit(handleFinalSubmit)}
+        >
+          {/* Image uploader */}
+          <ImageUpload
+            initialImage={previewImg}
+            onFileSelect={(file) => {
+              setSelectedFile(file);
+              setPreviewImg(URL.createObjectURL(file));
+            }}
           />
 
-          {/* Show preview (if exists) */}
-          {previewImg && (
-            <div className="mt-3">
-              <p className="text-sm opacity-70 mb-1">Preview:</p>
-              <img
-                src={previewImg}
-                alt="Preview"
-                className="h-24 w-24 rounded-lg object-cover shadow"
-              />
-            </div>
-          )}
-          {/* CATEGORY NAME */}
           <FormField
             label="Category Name"
-            type="text"
             as="input"
+            type="text"
             register={register}
             registerName="name"
             placeholder="Enter category name"
             error={errors.name}
           />
 
-          {/* CATEGORY DESCRIPTION */}
           <FormField
             label="Category Description"
             as="textarea"
+            rows={4}
             register={register}
             registerName="description"
             placeholder="Enter description"
-            rows={4}
             error={errors.description}
           />
 
-          <div className="modal-action">
-            <button type="button" className="btn" onClick={onClose}>
-              Cancel
-            </button>
+          {/* Hidden URL field */}
+          <input type="hidden" {...register("imageUrl")} />
 
-            <button type="submit" className="btn btn-primary">
-              {type === "edit" ? "Update" : "Save"}
-            </button>
+          {/* Buttons Section */}
+          <div className="modal-action w-full flex justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto justify-center">
+              <button
+                type="button"
+                className="btn btn-outline w-full"
+                onClick={onClose}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+
+              <ButtonLoader
+                type="submit"
+                loading={saving}
+                color="btn-primary"
+                size="w-full"
+              >
+                {type === "edit" ? "Update" : "Save"}
+              </ButtonLoader>
+            </div>
           </div>
         </form>
       </div>

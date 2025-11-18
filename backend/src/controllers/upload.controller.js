@@ -1,56 +1,45 @@
 import cloudinary from "../lib/cloudinary.js";
-import { uploadSchema } from "../../../shared/validations/upload.validation.js";
+import sharp from "sharp";
 
 export const uploadImage = async (req, res) => {
   try {
-    // Validate folder name using Zod
-    const validation = uploadSchema.safeParse(req.body);
+    const file = req.file;
+    const folderName = req.body.folderName || "default_folder";
 
-    if (!validation.success) {
+    if (!file) {
       return res.status(400).json({
         success: false,
-        errors: validation.error.flatten().fieldErrors,
+        message: "No file provided",
       });
     }
 
-    const { folder } = validation.data;
+    // 1️⃣ Resize + compress using Sharp
+    const resizedImageBuffer = await sharp(file.buffer)
+      .resize(800, 800, {
+        fit: "cover", // crop to fill — BEST for profile/category images
+      })
+      .jpeg({ quality: 85 }) // compress but keep good quality
+      .toBuffer();
 
-    // Check if file exists
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "Image file is required",
-      });
-    }
-
-    // Upload function wrapped in a Promise
-    const uploadToCloudinary = () => {
-      return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        );
-        stream.end(req.file.buffer);
-      });
-    };
-
-    // Upload image
-    const uploaded = await uploadToCloudinary();
-
-    return res.status(200).json({
-      success: true,
-      imageUrl: uploaded.secure_url, // ⬅ Only return URL
+    // 2️⃣ Upload resized buffer to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream({ folder: folderName }, (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        })
+        .end(resizedImageBuffer);
     });
-  } catch (error) {
-    console.error("IMAGE UPLOAD ERROR:", error);
 
+    return res.json({
+      success: true,
+      imageUrl: result.secure_url,
+    });
+  } catch (err) {
+    console.log("❌ Cloudinary Upload Error:", err);
     return res.status(500).json({
       success: false,
-      message: "Failed to upload image",
-      error: error.message,
+      message: "Upload failed due to server error",
     });
   }
 };

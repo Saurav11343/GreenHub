@@ -13,6 +13,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@tailwindcss/vite": "^4.1.17",
     "axios": "^1.13.2",
+    "browser-image-compression": "^2.0.2",
     "green-hub": "file:..",
     "lucide-react": "^0.553.0",
     "react": "^19.2.0",

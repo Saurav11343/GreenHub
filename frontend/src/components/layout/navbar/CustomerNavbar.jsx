@@ -1,13 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ThemeController from "../../ui/ThemeController";
 import { Sprout } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useAuthStore } from "../../../store/useAuthStore";
 import PageLoader from "../../loader/PageLoader";
 
+// IMPORT CATEGORY STORE
+import { useCategoryStore } from "../../../store/useCategoryStore";
+
 function CustomerNavbar() {
   const navigate = useNavigate();
   const { logout, logoutLoading } = useAuthStore();
+
+  const { categories, getAllCategories, loading } = useCategoryStore();
+
+  useEffect(() => {
+    getAllCategories();
+  }, [getAllCategories]);
 
   const handleLogout = async () => {
     const res = await logout();
@@ -49,22 +58,23 @@ function CustomerNavbar() {
                 <a onClick={() => navigate("/")}>Home</a>
               </li>
 
+              {/* DYNAMIC CATEGORY LIST - MOBILE */}
               <li>
                 <details>
                   <summary>Categories</summary>
-                  <ul className="p-2">
-                    <li>
-                      <a>Indoor Plants</a>
-                    </li>
-                    <li>
-                      <a>Outdoor Plants</a>
-                    </li>
-                    <li>
-                      <a>Succulents</a>
-                    </li>
-                    <li>
-                      <a>Flowering Plants</a>
-                    </li>
+                  <ul className="p-2 max-h-60 overflow-y-auto">
+                    {loading && <li className="opacity-70">Loading...</li>}
+                    {!loading && categories.length === 0 && (
+                      <li className="opacity-70">No categories</li>
+                    )}
+                    {!loading &&
+                      categories.map((cat) => (
+                        <li key={cat._id}>
+                          <a onClick={() => navigate(`/category/${cat._id}`)}>
+                            {cat.name}
+                          </a>
+                        </li>
+                      ))}
                   </ul>
                 </details>
               </li>
@@ -111,22 +121,28 @@ function CustomerNavbar() {
               <a onClick={() => navigate("/")}>Home</a>
             </li>
 
+            {/* DYNAMIC CATEGORIES - DESKTOP */}
             <li>
               <details>
                 <summary>Categories</summary>
-                <ul className="p-2 bg-base-100 rounded-box shadow">
-                  <li>
-                    <a>Indoor Plants</a>
-                  </li>
-                  <li>
-                    <a>Outdoor Plants</a>
-                  </li>
-                  <li>
-                    <a>Succulents</a>
-                  </li>
-                  <li>
-                    <a>Flowering Plants</a>
-                  </li>
+                <ul className="p-2 bg-base-100 rounded-box shadow max-h-64 overflow-y-auto">
+                  {loading && <li className="opacity-70 px-2">Loading...</li>}
+
+                  {!loading && categories.length === 0 && (
+                    <li className="opacity-70 px-2">No categories</li>
+                  )}
+
+                  {!loading &&
+                    categories.map((cat) => (
+                      <li key={cat._id}>
+                        <a
+                          onClick={() => navigate(`/category/${cat._id}`)}
+                          className="cursor-pointer"
+                        >
+                          {cat.name}
+                        </a>
+                      </li>
+                    ))}
                 </ul>
               </details>
             </li>
@@ -187,7 +203,7 @@ function CustomerNavbar() {
             </div>
           </div>
 
-          {/* PROFILE DROPDOWN (desktop only) */}
+          {/* PROFILE DROPDOWN - DESKTOP */}
           <div className="dropdown dropdown-end hidden md:block">
             <div
               tabIndex={0}
@@ -220,7 +236,6 @@ function CustomerNavbar() {
             </ul>
           </div>
 
-          {/* Theme Toggle */}
           <ThemeController />
         </div>
       </div>

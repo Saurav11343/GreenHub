@@ -1,76 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { uploadSchema } from "../../../shared/validations/upload.validation";
-import { useUploadStore } from "../store/useUploadStore";
+import ImageUpload from "../components/common/imageUpload";
 
 function TestUpload() {
-  const { imageUrl, loading, uploadImage } = useUploadStore();
+  const { register, handleSubmit, setValue, watch } = useForm();
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(uploadSchema),
-  });
+  const [trigger, setTrigger] = useState(false);
 
-  const onSubmit = async (data) => {
-    const res = await uploadImage(data.file, data.folder);
+  const startUpload = () => setTrigger((prev) => !prev);
 
-    if (!res.success) {
-      alert(res.message);
-    }
+  const onSubmit = (data) => {
+    console.log("Final Form Data:", data);
   };
 
   return (
-    <div className="p-10 max-w-lg mx-auto space-y-4">
-      <h1 className="text-2xl font-bold mb-4">Test Image Upload</h1>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 p-5">
+      <div className="text-xl font-bold">TestUpload Form</div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Folder Input */}
-        <div>
-          <input
-            type="text"
-            placeholder="Folder Name"
-            className="input input-bordered w-full"
-            {...register("folder")}
-          />
-          {errors.folder && (
-            <p className="text-red-500 text-sm mt-1">{errors.folder.message}</p>
-          )}
-        </div>
+      {/* Universal Image Upload */}
+      <ImageUpload
+        folderName="plants"
+        uploadTrigger={trigger}
+        onUploadComplete={(url) => {
+          console.log("Uploaded URL:", url);
+          setValue("imageUrl", url); // store inside form
+        }}
+      />
 
-        {/* File Input */}
-        <div>
-          <input
-            type="file"
-            className="file-input file-input-bordered w-full"
-            accept="image/*"
-            onChange={(e) => setValue("file", e.target.files[0])}
-          />
-          {errors.file && (
-            <p className="text-red-500 text-sm mt-1">{errors.file.message}</p>
-          )}
-        </div>
+      {/* Hidden field to store uploaded image URL */}
+      <input type="hidden" {...register("imageUrl")} />
 
-        <button
-          className="btn btn-primary w-full"
-          type="submit"
-          disabled={loading}
-        >
-          {loading ? "Uploading..." : "Upload"}
-        </button>
-      </form>
+      <button type="button" className="btn btn-primary" onClick={startUpload}>
+        Upload Image
+      </button>
 
-      {imageUrl && (
-        <div className="mt-4">
-          <p className="font-semibold">Uploaded Image:</p>
-          <img src={imageUrl} alt="Uploaded" className="mt-2 rounded shadow" />
-        </div>
-      )}
-    </div>
+      <button type="submit" className="btn btn-success">
+        Submit Form
+      </button>
+    </form>
   );
 }
 
