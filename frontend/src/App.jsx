@@ -27,8 +27,6 @@ function App() {
   return (
     <div>
       <Routes>
-        <Route path="/test-upload" element={<TestUpload />} />
-
         {/* AUTH PAGES (NO NAVBAR) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
