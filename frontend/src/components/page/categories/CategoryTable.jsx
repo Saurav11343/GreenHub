@@ -5,7 +5,7 @@ function CategoryTable({ data = [], onEdit, onDelete }) {
   return (
     <div
       className="overflow-x-auto overflow-y-auto hide-scrollbar 
-                 bg-base-100 rounded-xl shadow max-h-[400px] md:max-h-[470px]"
+                 bg-base-100 rounded-xl shadow  max-h-[420px] md:max-h-[470px] lg:max-h-[470px] "
     >
       <table className="table table-zebra w-full">
         <thead>

@@ -4,16 +4,17 @@ import { Search } from "lucide-react";
 function FormField({
   label,
   type = "text",
-  as = "input", // "input" | "textarea" | "search"
+  as = "input", // "input" | "textarea" | "search" | "select"
   register,
   registerName,
+  registerOptions = {}, // NEW: pass options like { valueAsNumber: true }
   placeholder = "",
   error,
   rows = 4,
   icon,
-  ...props
+  children, // pull children explicitly
+  ...props // remaining props (do NOT include children here)
 }) {
-  const FieldTag = as === "textarea" ? "textarea" : "input";
   const isSearch = as === "search";
 
   return (
@@ -33,25 +34,51 @@ function FormField({
             type="search"
             placeholder={placeholder}
             className="grow bg-transparent outline-none"
-            {...register(registerName)}
+            {...(register ? register(registerName, registerOptions) : {})}
             {...props}
           />
         </label>
       )}
 
-      {/* NORMAL INPUT / TEXTAREA */}
-      {!isSearch && (
-        <FieldTag
-          type={as === "textarea" ? undefined : type}
-          rows={as === "textarea" ? rows : undefined}
-          placeholder={placeholder}
-          {...register(registerName)}
+      {/* SELECT */}
+      {as === "select" && !isSearch && (
+        <select
+          {...(register ? register(registerName, registerOptions) : {})}
           {...props}
-          className={`${
-            as === "textarea"
-              ? "textarea textarea-bordered"
-              : "input input-bordered"
-          } w-full ${error ? "input-error " : ""}`}
+          className={`select select-bordered w-full ${
+            error ? "select-error" : ""
+          }`}
+          defaultValue={props.defaultValue ?? ""}
+        >
+          {children}
+        </select>
+      )}
+
+      {/* TEXTAREA */}
+      {as === "textarea" && !isSearch && (
+        <textarea
+          {...(register ? register(registerName, registerOptions) : {})}
+          {...props}
+          rows={rows}
+          placeholder={placeholder}
+          className={`textarea textarea-bordered w-full ${
+            error ? "textarea-error" : ""
+          }`}
+        >
+          {children}
+        </textarea>
+      )}
+
+      {/* NORMAL INPUT */}
+      {as !== "textarea" && as !== "select" && !isSearch && (
+        <input
+          {...(register ? register(registerName, registerOptions) : {})}
+          {...props}
+          type={type}
+          placeholder={placeholder}
+          className={`input input-bordered w-full ${
+            error ? "input-error" : ""
+          }`}
         />
       )}
 
