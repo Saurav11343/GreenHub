@@ -5,7 +5,7 @@ function PlantCard({ plant, onEdit, onDelete }) {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center bg-base-100 shadow-md border rounded-xl overflow-hidden hover:shadow-lg transition duration-200 p-4 gap-4">
       {/* Section 1 – Image */}
-      <div className="w-full sm:w-28 h-44 sm:h-28 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
+      <div className="w-full sm:w-28 h-44 sm:h-28 shrink-0 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
         <img
           src={plant.imageUrl || "/plant.webp"}
           alt={plant.name || "plant image"}
