@@ -11,6 +11,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import RootLayout from "./components/layout/layouts/RootLayout";
 import AdminLayout from "./components/layout/layouts/AdminLayout";
 import ManageCategories from "./pages/admin/ManageCategories";
+import ManagePlants from "./pages/admin/ManagePlants";
 
 function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -47,6 +48,7 @@ function App() {
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/categories" element={<ManageCategories />} />
+            <Route path="/admin/plants" element={<ManagePlants />} />
           </Route>
         </Route>
       </Routes>
