@@ -12,6 +12,7 @@ import RootLayout from "./components/layout/layouts/RootLayout";
 import AdminLayout from "./components/layout/layouts/AdminLayout";
 import ManageCategories from "./pages/admin/ManageCategories";
 import ManagePlants from "./pages/admin/ManagePlants";
+import PlantBrowse from "./pages/customer/PlantBrowse";
 
 function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -36,6 +37,7 @@ function App() {
         <Route element={<RootLayout />}>
           {/* Public pages */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/plants" element={<PlantBrowse />} />
 
           {/* Customer protected pages */}
           <Route element={<ProtectRoutes allowedRoles={["Customer"]} />}>

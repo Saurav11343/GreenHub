@@ -1,7 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router";
 import HeroBgImage from "../../../assets/heroBackgroundImage.webp";
 
 function HeroSection() {
+  const navigate = useNavigate();
   return (
     <div
       className="hero min-h-[calc(100vh-64px)] relative"
@@ -34,7 +36,10 @@ function HeroSection() {
               Shop Now
             </button>
 
-            <button className="btn btn-outline btn-success btn-wide font-semibold border-2">
+            <button
+              onClick={() => navigate("/plants")}
+              className="btn btn-outline btn-success btn-wide font-semibold border-2"
+            >
               Browse Plants
             </button>
           </div>
