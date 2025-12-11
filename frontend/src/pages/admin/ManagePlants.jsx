@@ -150,7 +150,7 @@ function ManagePlants() {
       <PlantSearch onSearch={setSearchQuery} />
 
       {/* GRID */}
-      <div className="overflow-x-auto overflow-y-auto hide-scrollbar bg-base-100 rounded-xl shadow max-h-[420px] md:max-h-[470px] lg:max-h-[470px]">
+      <div className="overflow-x-auto overflow-y-auto hide-scrollbar bg-base-100 rounded-xl shadow max-h-[590px] md:max-h-[470px] lg:max-h-[470px]">
         <div className="p-4 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredData.map((plant) => (

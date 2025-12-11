@@ -7,10 +7,17 @@ import {
   ShoppingCart,
   Users,
   Settings,
+  LogOut,
 } from "lucide-react";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 function AdminSidebar() {
   const navigate = useNavigate();
+  const { logout } = useAuthStore();
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   return (
     <div className="drawer-side is-drawer-close:overflow-visible">
@@ -91,6 +98,18 @@ function AdminSidebar() {
             >
               <Settings className="size-5" />
               <span className="is-drawer-close:hidden">Settings</span>
+            </button>
+          </li>
+
+          {/* 🔥 Logout Button (added) */}
+          <li className="mt-2">
+            <button
+              onClick={handleLogout}
+              className="text-error is-drawer-close:tooltip is-drawer-close:tooltip-right"
+              data-tip="Logout"
+            >
+              <LogOut className="size-5" />
+              <span className="is-drawer-close:hidden">Logout</span>
             </button>
           </li>
         </ul>

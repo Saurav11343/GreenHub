@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import ThemeController from "../../ui/ThemeController";
 import { Sprout } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router"; // <-- react-router-dom
 import { useAuthStore } from "../../../store/useAuthStore";
 import PageLoader from "../../loader/PageLoader";
 
@@ -12,7 +12,7 @@ function CustomerNavbar() {
   const navigate = useNavigate();
   const { logout, logoutLoading } = useAuthStore();
 
-  const { categories, getAllCategories, loading } = useCategoryStore();
+  const { categories = [], getAllCategories, loading } = useCategoryStore();
 
   useEffect(() => {
     getAllCategories();
@@ -20,7 +20,17 @@ function CustomerNavbar() {
 
   const handleLogout = async () => {
     const res = await logout();
-    if (res.success) navigate("/");
+    if (res?.success) navigate("/");
+  };
+
+  // navigate to /plants and pass categoryId in router state
+  const goToPlantsWithCategory = (catId) => {
+    // ensure catId exists
+    if (!catId) {
+      navigate("/plants");
+      return;
+    }
+    navigate("/plants", { state: { categoryId: catId } });
   };
 
   return (
@@ -55,7 +65,12 @@ function CustomerNavbar() {
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow"
             >
               <li>
-                <a onClick={() => navigate("/")}>Home</a>
+                <button
+                  className="w-full text-left"
+                  onClick={() => navigate("/")}
+                >
+                  Home
+                </button>
               </li>
 
               {/* DYNAMIC CATEGORY LIST - MOBILE */}
@@ -70,9 +85,12 @@ function CustomerNavbar() {
                     {!loading &&
                       categories.map((cat) => (
                         <li key={cat._id}>
-                          <a onClick={() => navigate(`/category/${cat._id}`)}>
+                          <button
+                            className="w-full text-left"
+                            onClick={() => goToPlantsWithCategory(cat._id)}
+                          >
                             {cat.name}
-                          </a>
+                          </button>
                         </li>
                       ))}
                   </ul>
@@ -80,26 +98,54 @@ function CustomerNavbar() {
               </li>
 
               <li>
-                <a onClick={() => navigate("/plants")}>Browse Plants</a>
+                <button
+                  className="w-full text-left"
+                  onClick={() => navigate("/plants")}
+                >
+                  Browse Plants
+                </button>
               </li>
               <li>
-                <a onClick={() => navigate("/contact")}>Contact</a>
+                <button
+                  className="w-full text-left"
+                  onClick={() => navigate("/contact")}
+                >
+                  Contact
+                </button>
               </li>
 
               <li>
-                <a onClick={() => navigate("/profile")}>Profile</a>
+                <button
+                  className="w-full text-left"
+                  onClick={() => navigate("/profile")}
+                >
+                  Profile
+                </button>
               </li>
               <li>
-                <a onClick={() => navigate("/orders")}>Orders</a>
+                <button
+                  className="w-full text-left"
+                  onClick={() => navigate("/orders")}
+                >
+                  Orders
+                </button>
               </li>
               <li>
-                <a onClick={() => navigate("/settings")}>Settings</a>
+                <button
+                  className="w-full text-left"
+                  onClick={() => navigate("/settings")}
+                >
+                  Settings
+                </button>
               </li>
 
               <li>
-                <a onClick={handleLogout} className="text-error">
+                <button
+                  className="w-full text-left text-error"
+                  onClick={handleLogout}
+                >
                   Logout
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -118,7 +164,7 @@ function CustomerNavbar() {
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1 gap-3">
             <li>
-              <a onClick={() => navigate("/")}>Home</a>
+              <button onClick={() => navigate("/")}>Home</button>
             </li>
 
             {/* DYNAMIC CATEGORIES - DESKTOP */}
@@ -135,12 +181,12 @@ function CustomerNavbar() {
                   {!loading &&
                     categories.map((cat) => (
                       <li key={cat._id}>
-                        <a
-                          onClick={() => navigate(`/category/${cat._id}`)}
-                          className="cursor-pointer"
+                        <button
+                          className="w-full text-left cursor-pointer px-2 py-1"
+                          onClick={() => goToPlantsWithCategory(cat._id)}
                         >
                           {cat.name}
-                        </a>
+                        </button>
                       </li>
                     ))}
                 </ul>
@@ -148,10 +194,10 @@ function CustomerNavbar() {
             </li>
 
             <li>
-              <a onClick={() => navigate("/plants")}>Browse Plants</a>
+              <button onClick={() => navigate("/plants")}>Browse Plants</button>
             </li>
             <li>
-              <a onClick={() => navigate("/contact")}>Contact</a>
+              <button onClick={() => navigate("/contact")}>Contact</button>
             </li>
           </ul>
         </div>
@@ -220,18 +266,18 @@ function CustomerNavbar() {
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow"
             >
               <li>
-                <a onClick={() => navigate("/profile")}>Profile</a>
+                <button onClick={() => navigate("/profile")}>Profile</button>
               </li>
               <li>
-                <a onClick={() => navigate("/orders")}>Orders</a>
+                <button onClick={() => navigate("/orders")}>Orders</button>
               </li>
               <li>
-                <a onClick={() => navigate("/settings")}>Settings</a>
+                <button onClick={() => navigate("/settings")}>Settings</button>
               </li>
               <li>
-                <a onClick={handleLogout} className="text-error">
+                <button onClick={handleLogout} className="text-error">
                   Logout
-                </a>
+                </button>
               </li>
             </ul>
           </div>

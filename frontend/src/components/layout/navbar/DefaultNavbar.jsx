@@ -1,17 +1,26 @@
 import React, { useEffect } from "react";
 import ThemeController from "../../ui/ThemeController";
 import { Sprout } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router"; // <- use react-router-dom
 import { useCategoryStore } from "../../../store/useCategoryStore";
 
 function DefaultNavbar() {
   const navigate = useNavigate();
 
-  const { categories, getAllCategories, loading } = useCategoryStore();
+  const { categories = [], getAllCategories, loading } = useCategoryStore();
 
   useEffect(() => {
     getAllCategories();
   }, [getAllCategories]);
+
+  // navigate to /plants and pass categoryId in router state
+  const goToPlantsWithCategory = (catId) => {
+    if (!catId) {
+      navigate("/plants");
+      return;
+    }
+    navigate("/plants", { state: { categoryId: catId } });
+  };
 
   return (
     <div className="navbar bg-base-100 shadow-sm sticky top-0 z-50 px-4">
@@ -42,7 +51,12 @@ function DefaultNavbar() {
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a onClick={() => navigate("/")}>Home</a>
+              <button
+                className="w-full text-left"
+                onClick={() => navigate("/")}
+              >
+                Home
+              </button>
             </li>
 
             {/* DYNAMIC CATEGORIES - MOBILE */}
@@ -59,9 +73,12 @@ function DefaultNavbar() {
                   {!loading &&
                     categories.map((cat) => (
                       <li key={cat._id}>
-                        <a onClick={() => navigate(`/category/${cat._id}`)}>
+                        <button
+                          className="w-full text-left"
+                          onClick={() => goToPlantsWithCategory(cat._id)}
+                        >
                           {cat.name}
-                        </a>
+                        </button>
                       </li>
                     ))}
                 </ul>
@@ -69,25 +86,38 @@ function DefaultNavbar() {
             </li>
 
             <li>
-              <a onClick={() => navigate("/plants")}>Browse Plants</a>
+              <button
+                className="w-full text-left"
+                onClick={() => navigate("/plants")}
+              >
+                Browse Plants
+              </button>
             </li>
             <li>
-              <a onClick={() => navigate("/contact")}>Contact</a>
+              <button
+                className="w-full text-left"
+                onClick={() => navigate("/contact")}
+              >
+                Contact
+              </button>
             </li>
 
             <li>
-              <a onClick={() => navigate("/login")} className="cursor-pointer">
+              <button
+                className="w-full text-left"
+                onClick={() => navigate("/login")}
+              >
                 Login
-              </a>
+              </button>
             </li>
 
             <li>
-              <a
+              <button
+                className="w-full text-left text-success font-semibold"
                 onClick={() => navigate("/signup")}
-                className="text-success font-semibold cursor-pointer"
               >
                 Signup
-              </a>
+              </button>
             </li>
           </ul>
         </div>
@@ -106,12 +136,12 @@ function DefaultNavbar() {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1 gap-2">
           <li>
-            <a
+            <button
               onClick={() => navigate("/")}
               className="font-medium cursor-pointer"
             >
               Home
-            </a>
+            </button>
           </li>
 
           {/* DYNAMIC CATEGORIES - DESKTOP */}
@@ -120,7 +150,7 @@ function DefaultNavbar() {
               <summary className="font-medium cursor-pointer">
                 Categories
               </summary>
-              <ul className="p-2 bg-base-100 rounded-box shadow max-h-64 overflow-y-auto">
+              <ul className="p-2 bg-base-100 rounded-box shadow max-h-64 overflow-y-auto hide-scrollbar">
                 {loading && <li className="opacity-70 px-2">Loading...</li>}
 
                 {!loading && categories.length === 0 && (
@@ -130,12 +160,12 @@ function DefaultNavbar() {
                 {!loading &&
                   categories.map((cat) => (
                     <li key={cat._id}>
-                      <a
-                        className="cursor-pointer"
-                        onClick={() => navigate(`/category/${cat._id}`)}
+                      <button
+                        className="w-full text-left cursor-pointer px-2 py-1"
+                        onClick={() => goToPlantsWithCategory(cat._id)}
                       >
                         {cat.name}
-                      </a>
+                      </button>
                     </li>
                   ))}
               </ul>
@@ -143,21 +173,21 @@ function DefaultNavbar() {
           </li>
 
           <li>
-            <a
+            <button
               onClick={() => navigate("/plants")}
               className="font-medium cursor-pointer"
             >
               Browse Plants
-            </a>
+            </button>
           </li>
 
           <li>
-            <a
+            <button
               onClick={() => navigate("/contact")}
               className="font-medium cursor-pointer"
             >
               Contact
-            </a>
+            </button>
           </li>
         </ul>
       </div>
