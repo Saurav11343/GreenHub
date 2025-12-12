@@ -5,7 +5,7 @@ import React, {
   useRef,
   useMemo,
 } from "react";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import PlantFilter from "../../components/page/plants/PlantFilter";
 import PlantCartCard from "../../components/page/plants/PlantCartCard";
 import { usePlantStore } from "../../store/usePlantStore";
@@ -19,6 +19,8 @@ export default function PlantBrowse() {
   const categoryIdFromState = location.state?.categoryId || null;
 
   const [filteredPlants, setFilteredPlants] = useState(null);
+
+  const navigate = useNavigate();
 
   // run initial fetch once
   const didFetchRef = useRef(false);
@@ -136,6 +138,7 @@ export default function PlantBrowse() {
                   <div
                     key={p._id ?? p.id}
                     className="h-80 overflow-auto hide_scrollbar p-2"
+                    onClick={() => navigate(`/plants/details/${p._id}`)}
                   >
                     <PlantCartCard
                       image={p.imageUrl || p.image || p.photo || "/plant.webp"}
