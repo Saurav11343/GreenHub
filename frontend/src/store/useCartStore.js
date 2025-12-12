@@ -1,24 +1,24 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 
-export const usePlantStore = create((set, get) => ({
-  plants: [],
-  plant: null, //for getPlantbyId
+export const useCartStore = create((set, get) => ({
+  cartItems: [],
   loading: false,
   error: null,
   message: null,
 
-  getAllPlants: async () => {
+  getUserCartItem: async (userId) => {
     try {
       set({ loading: true, error: null, message: null });
 
-      const res = await axiosInstance.get("/plant");
+      const res = await axiosInstance.get(`/cartItem/${userId}`);
 
       if (res.data?.success) {
         set({
-          plants: res.data.data,
+          cartItems: res.data.data,
         });
       }
+
       return res.data;
     } catch (err) {
       const message = err.response?.data?.message || "Network error";
@@ -29,42 +29,21 @@ export const usePlantStore = create((set, get) => ({
     }
   },
 
-  getPlantById: async (id) => {
+  createCartItem: async (data) => {
     try {
       set({ loading: true, error: null, message: null });
 
-      const res = await axiosInstance.get(`/plant/${id}`);
-
-      if (res.data?.success) {
-        set({
-          plant: res.data.data,
-        });
-      }
-      return res.data;
-    } catch (err) {
-      const message = err.response?.data?.message || "Network error";
-      set({ error: message });
-      return { success: false, message };
-    } finally {
-      set({ loading: false });
-    }
-  },
-  createPlant: async (data) => {
-    try {
-      set({ loading: true, error: null, message: null });
-
-      const res = await axiosInstance.post("/plant", data);
+      const res = await axiosInstance.post("/cartItem", data);
 
       if (res.data?.success) {
         set({
           message: res.data.message,
         });
 
-        // Refresh plant after success
-        await get().getAllPlants();
+        await get().getUserCartItem(data.userId);
       } else {
         set({
-          error: res.data.message || "Failed to create plant",
+          error: res.data.message || "Failed to add item to cart",
         });
       }
 
@@ -77,52 +56,47 @@ export const usePlantStore = create((set, get) => ({
       set({ loading: false });
     }
   },
-  deletePlant: async (id) => {
-    try {
-      set({ loading: true, error: null });
 
-      const res = await axiosInstance.delete(`/plant/${id}`);
-
-      if (res.data?.success) {
-        set({
-          message: res.data.message,
-        });
-
-        // refresh after delete
-        await get().getAllPlants();
-      } else {
-        set({ error: res.data.message });
-      }
-
-      return res.data;
-    } catch (err) {
-      const message = err.response?.data?.message || "Network error";
-      set({ error: message });
-      return { success: false, message };
-    } finally {
-      set({ loading: false });
-    }
-  },
-  updatePlant: async (id, data) => {
+  deleteCartItem: async (userId, cartId) => {
     try {
       set({ loading: true, error: null, message: null });
-
-      const res = await axiosInstance.put(`/plant/${id}`, data);
-
+      const res = await axiosInstance.delete(`/cartItem/${cartId}`);
       if (res.data?.success) {
         set({
           message: res.data.message,
         });
-
-        // Refresh plant list after updating
-        await get().getAllPlants();
+        await get().getUserCartItem(userId);
       } else {
         set({
-          error: res.data.message,
+          error: res.data.message || "Failed to delete cart item",
         });
       }
+      return res.data;
+    } catch (err) {
+      const message = err.response?.data?.message || "Network error";
+      set({ error: message });
+      return { success: false, message };
+    } finally {
+      set({ loading: false });
+    }
+  },
 
-      return res.data; // return for toast
+  clearCartItem: async (userId) => {
+    try {
+      set({ loading: true, error: null, message: null });
+      const res = await axiosInstance.delete(`/cartItem/user/${userId}`);
+      if (res.data?.success) {
+        set({
+          message: res.data.message,
+          cartItems: [],
+        });
+        await get().getUserCartItem(userId);
+      } else {
+        set({
+          error: res.data.message || "Failed to clear cart",
+        });
+      }
+      return res.data;
     } catch (err) {
       const message = err.response?.data?.message || "Network error";
       set({ error: message });
