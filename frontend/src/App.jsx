@@ -15,7 +15,7 @@ import ManagePlants from "./pages/admin/ManagePlants";
 import PlantBrowse from "./pages/customer/PlantBrowse";
 import PlantDetail from "./pages/customer/PlantDetail";
 import CheckOut from "./pages/customer/CheckOut";
-
+//hello
 function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
 
