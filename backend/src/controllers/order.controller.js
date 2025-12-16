@@ -12,6 +12,9 @@ import {
 
 export const createOrder = async (req, res) => {
   try {
+    /**
+     * 1️⃣ Validate only user-provided fields
+     */
     const validation = createOrderSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({
@@ -20,8 +23,11 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    const { userId, totalAmount, shippingAddress } = validation.data;
+    const { userId, shippingAddress } = validation.data;
 
+    /**
+     * 2️⃣ Validate user
+     */
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -30,22 +36,42 @@ export const createOrder = async (req, res) => {
       });
     }
 
+    /**
+     * 3️⃣ Fetch cart items (SOURCE OF TRUTH)
+     */
     const cartItems = await CartItem.find({ userId }).populate(
       "plantId",
       "price name"
     );
 
-    if (cartItems.length === 0) {
+    if (!cartItems.length) {
       return res.status(400).json({
         success: false,
         message: "Your cart is empty",
       });
     }
 
-    const calculatedTotal = cartItems.reduce((sum, item) => {
-      return sum + item.quantity * item.plantId.price;
-    }, 0);
+    /**
+     * 4️⃣ Calculate total price (SERVER SIDE)
+     */
+    let calculatedTotal = 0;
 
+    const orderDetails = cartItems.map((item) => {
+      const price = item.plantId.price;
+      const quantity = item.quantity;
+
+      calculatedTotal += price * quantity;
+
+      return {
+        plantId: item.plantId._id,
+        quantity,
+        price,
+      };
+    });
+
+    /**
+     * 5️⃣ Create order
+     */
     const newOrder = await Order.create({
       userId,
       totalAmount: calculatedTotal,
@@ -53,23 +79,34 @@ export const createOrder = async (req, res) => {
       status: "Pending",
     });
 
-    const orderDetails = cartItems.map((item) => ({
+    /**
+     * 6️⃣ Create order details
+     */
+    const orderDetailsWithOrderId = orderDetails.map((detail) => ({
+      ...detail,
       orderId: newOrder._id,
-      plantId: item.plantId._id,
-      quantity: item.quantity,
-      price: item.plantId.price,
     }));
 
-    await OrderDetail.insertMany(orderDetails);
+    await OrderDetail.insertMany(orderDetailsWithOrderId);
+
+    /**
+     * 7️⃣ Clear cart AFTER successful order creation
+     */
     await CartItem.deleteMany({ userId });
 
+    /**
+     * 8️⃣ Success response
+     */
     return res.status(201).json({
       success: true,
       message: "Order created successfully",
-      data: { newOrder, orderDetails },
+      data: {
+        orderId: newOrder._id,
+        totalAmount: calculatedTotal,
+      },
     });
   } catch (error) {
-    console.log("Error in createOrder controller:", error);
+    console.error("Error in createOrder controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",

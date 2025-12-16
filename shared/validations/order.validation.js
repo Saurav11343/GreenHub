@@ -2,10 +2,9 @@ import { z } from "zod";
 
 export const createOrderSchema = z.object({
   userId: z.string().min(1, "User ID is required"),
-  totalAmount: z.coerce.number().positive("Total amount must be positive"),
   shippingAddress: z
     .string()
-    .min(5, "Shipping address  must be at least 5 characters"),
+    .min(5, "Shipping address must be at least 5 characters"),
 });
 
 export const updateOrderStatusSchema = z.object({
