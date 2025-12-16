@@ -15,6 +15,7 @@ import ManagePlants from "./pages/admin/ManagePlants";
 import PlantBrowse from "./pages/customer/PlantBrowse";
 import PlantDetail from "./pages/customer/PlantDetail";
 import CheckOut from "./pages/customer/CheckOut";
+import Payment from "./pages/customer/Payment";
 //hello
 function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -55,6 +56,7 @@ function App() {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/categories" element={<ManageCategories />} />
             <Route path="/admin/plants" element={<ManagePlants />} />
+            <Route path="/admin/orders" element={<ManagePlants />} />
           </Route>
         </Route>
       </Routes>

@@ -23,7 +23,6 @@ const paymentSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      required: true,
       enum: ["Pending", "Success", "Failed"],
       default: "Pending",
     },
@@ -34,3 +33,5 @@ const paymentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+export default mongoose.model("Payment", paymentSchema);
