@@ -9,6 +9,7 @@ import FormField from "../../components/common/FormField";
 import PageLoader from "../../components/loader/PageLoader";
 import toast from "react-hot-toast";
 import { useOrderStore } from "../../store/useOrderStore";
+import Payment from "./Payment";
 
 function CheckOut() {
   const navigate = useNavigate();
@@ -47,6 +48,9 @@ function CheckOut() {
   const [quantities, setQuantities] = useState({});
   const [updatingItemId, setUpdatingItemId] = useState(null);
   const [initialLoading, setInitialLoading] = useState(true);
+
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [createdOrderId, setCreatedOrderId] = useState(null);
 
   // initial fetch
   useEffect(() => {
@@ -125,17 +129,14 @@ function CheckOut() {
   // submit (order creation will go here)
   const onSubmit = async (data) => {
     try {
-      console.log("Order Data:", data);
-
       const res = await createOrder(data);
 
       if (res.success) {
         toast.success("Order created successfully");
 
-        const orderId = res.data.orderId;
-        console.log("Order ID:", orderId);
-
-        navigate(`/payment/${orderId}`);
+        setCreatedOrderId(res.data.orderId);
+        console.log("Created order ID ckeckout:", res.data.orderId);
+        setShowPaymentModal(true);
       } else {
         toast.error(res.message || "Failed to create order");
       }
@@ -280,6 +281,18 @@ function CheckOut() {
             </button>
           </form>
         </div>
+        {showPaymentModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="bg-base-100 rounded shadow-lg w-full max-w-md relative">
+             
+
+              <Payment
+                orderId={createdOrderId}
+                onClose={() => setShowPaymentModal(false)}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
