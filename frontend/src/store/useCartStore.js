@@ -6,6 +6,7 @@ export const useCartStore = create((set, get) => ({
   loading: false,
   error: null,
   message: null,
+  Updateloading: false,
 
   getUserCartItem: async (userId) => {
     try {
@@ -78,6 +79,31 @@ export const useCartStore = create((set, get) => ({
       return { success: false, message };
     } finally {
       set({ loading: false });
+    }
+  },
+
+  updateCartItem: async (cartId, data) => {
+    try {
+      set({ Updateloading: true, error: null, message: null });
+      const res = await axiosInstance.put(`/cartItem/${cartId}`, data);
+
+      if (res.data?.success) {
+        set({
+          message: res.data.message,
+        });
+        await get().getUserCartItem(data.userId);
+      } else {
+        set({
+          error: res.data.message || "Failed to update cart item",
+        });
+      }
+      return res.data;
+    } catch (err) {
+      const message = err.response?.data?.message || "Network error";
+      set({ error: message });
+      return { success: false, message };
+    } finally {
+      set({ Updateloading: false });
     }
   },
 
