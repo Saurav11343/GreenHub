@@ -15,7 +15,8 @@ import ManagePlants from "./pages/admin/ManagePlants";
 import PlantBrowse from "./pages/customer/PlantBrowse";
 import PlantDetail from "./pages/customer/PlantDetail";
 import CheckOut from "./pages/customer/CheckOut";
-import Payment from "./pages/customer/Payment";
+import PaymentDashboard from "./pages/admin/PaymentDashboard";
+import OrderDashboard from "./pages/admin/OrderDashboard";
 //hello
 function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -56,7 +57,8 @@ function App() {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/categories" element={<ManageCategories />} />
             <Route path="/admin/plants" element={<ManagePlants />} />
-            <Route path="/admin/orders" element={<ManagePlants />} />
+            <Route path="/admin/orders" element={<OrderDashboard />} />
+            <Route path="/admin/payments" element={<PaymentDashboard />} />
           </Route>
         </Route>
       </Routes>

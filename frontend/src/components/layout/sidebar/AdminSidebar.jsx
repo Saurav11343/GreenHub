@@ -8,6 +8,7 @@ import {
   Users,
   Settings,
   LogOut,
+  FileChartColumn,
 } from "lucide-react";
 import { useAuthStore } from "../../../store/useAuthStore";
 
@@ -74,6 +75,18 @@ function AdminSidebar() {
             >
               <ShoppingCart className="size-5" />
               <span className="is-drawer-close:hidden">Orders</span>
+            </button>
+          </li>
+
+          {/* Payments  */}
+          <li>
+            <button
+              onClick={() => navigate("/admin/payments")}
+              className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+              data-tip="Payments"
+            >
+              <FileChartColumn className="size-5" />
+              <span className="is-drawer-close:hidden">Payments</span>
             </button>
           </li>
 
