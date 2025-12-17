@@ -2,11 +2,17 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 
 export const useOrderStore = create((set) => ({
+  
+  orders: [],
+  totalCount: 0,
+
+  order: null,
   orderItems: [],
+
   loading: false,
   error: null,
   message: null,
-  order: null,
+
 
   createOrder: async (data) => {
     try {
@@ -18,13 +24,9 @@ export const useOrderStore = create((set) => ({
       });
 
       if (res.data?.success) {
-        set({
-          message: res.data.message,
-        });
+        set({ message: res.data.message });
       } else {
-        set({
-          error: res.data.message || "Failed to create order",
-        });
+        set({ error: res.data.message || "Failed to create order" });
       }
 
       return res.data;
@@ -41,14 +43,10 @@ export const useOrderStore = create((set) => ({
     }
   },
 
+
   getOrderById: async (orderId) => {
     try {
-      set({
-        loading: true,
-        error: null,
-        message: null,
-        order: null,
-      });
+      set({ loading: true, error: null, message: null, order: null });
 
       const res = await axiosInstance.get(`/order/${orderId}`);
 
@@ -57,11 +55,8 @@ export const useOrderStore = create((set) => ({
           order: res.data.order,
           message: res.data.message,
         });
-        console.log("Fetched order:", res.data.order);
       } else {
-        set({
-          error: res.data.message || "Failed to fetch order",
-        });
+        set({ error: res.data.message || "Failed to fetch order" });
       }
 
       return res.data;
@@ -72,6 +67,41 @@ export const useOrderStore = create((set) => ({
         "Network error";
 
       set({ error: message });
+      return { success: false, message };
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+
+  getAllOrders: async () => {
+    try {
+      set({ loading: true, error: null });
+
+      const res = await axiosInstance.get("/order");
+
+      if (res.data?.success) {
+        set({
+          orders: res.data.orders || [],
+          totalCount: res.data.total || 0,
+        });
+      } else {
+        set({
+          orders: [],
+          totalCount: 0,
+        });
+      }
+
+      return res.data;
+    } catch (err) {
+      const message = err.response?.data?.message || "Failed to fetch orders";
+
+      set({
+        error: message,
+        orders: [],
+        totalCount: 0,
+      });
+
       return { success: false, message };
     } finally {
       set({ loading: false });

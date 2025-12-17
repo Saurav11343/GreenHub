@@ -28,7 +28,7 @@ export const createRazorpayOrder = async (req, res) => {
       order,
     });
   } catch (error) {
-    console.error("Razorpay Error:", error)
+    console.error("Razorpay Error:", error);
 
     res.status(500).json({
       success: false,
@@ -61,12 +61,7 @@ export const saveOnlinePayment = async (req, res) => {
       transactionId,
     });
 
-
-    await Order.findByIdAndUpdate(
-      orderId,
-      { status: "Paid" },
-      { new: true }
-    );
+    await Order.findByIdAndUpdate(orderId, { status: "Paid" }, { new: true });
 
     res.json({
       success: true,
@@ -79,6 +74,88 @@ export const saveOnlinePayment = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to save payment",
+    });
+  }
+};
+export const getAllPayments = async (req, res) => {
+  try {
+    const {
+      status,
+      method,
+      userId,
+      minAmount,
+      maxAmount,
+      dateRange, // 👈 from frontend
+      sort,
+    } = req.query;
+
+    const filter = {};
+
+    // Status filter
+    if (status) filter.status = status;
+
+    // Method filter
+    if (method) filter.method = method;
+
+    // User filter
+    if (userId) filter.userId = userId;
+
+    // Amount filter
+    if (minAmount || maxAmount) {
+      filter.amount = {};
+      if (!isNaN(minAmount)) filter.amount.$gte = Number(minAmount);
+      if (!isNaN(maxAmount)) filter.amount.$lte = Number(maxAmount);
+    }
+
+    // ✅ DATE RANGE FILTER (SERVER SIDE)
+    if (dateRange) {
+      const now = new Date();
+      let fromDate;
+      let toDate = new Date();
+
+      // End of today
+      toDate.setHours(23, 59, 59, 999);
+
+      if (dateRange === "today") {
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+      }
+
+      if (dateRange === "7days") {
+        fromDate = new Date();
+        fromDate.setDate(fromDate.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+      }
+
+      if (dateRange === "month") {
+        fromDate = new Date();
+        fromDate.setMonth(fromDate.getMonth() - 1);
+        fromDate.setHours(0, 0, 0, 0);
+      }
+
+      filter.createdAt = {
+        $gte: fromDate,
+        $lte: toDate,
+      };
+    }
+
+    // Sorting
+    const sortQuery = sort === "oldest" ? { createdAt: 1 } : { createdAt: -1 };
+
+    const payments = await Payment.find(filter)
+      .populate("orderId", "totalAmount status")
+      .sort(sortQuery);
+
+    res.json({
+      success: true,
+      totalCount: payments.length,
+      payments,
+    });
+  } catch (error) {
+    console.error("Get payments error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch payments",
     });
   }
 };
