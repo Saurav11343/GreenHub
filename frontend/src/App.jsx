@@ -44,13 +44,13 @@ function App() {
           {/* Public pages */}
           <Route path="/" element={<HomePage />} />
           <Route path="/plants" element={<PlantBrowse />} />
-          <Route path="/plants/details/:id" element={<PlantDetail />} />
 
           {/* Customer protected pages */}
           <Route element={<ProtectRoutes allowedRoles={["Customer"]} />}>
             <Route path="/customer/checkout/:id" element={<CheckOut />} />
             <Route path="/customer/orders/" element={<CustomerOrder />} />
             <Route path="/customer/payments/" element={<CustomerPayments />} />
+            <Route path="/plants/details/:id" element={<PlantDetail />} />
           </Route>
         </Route>
 

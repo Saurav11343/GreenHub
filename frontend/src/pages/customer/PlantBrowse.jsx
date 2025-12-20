@@ -5,13 +5,20 @@ import React, {
   useRef,
   useMemo,
 } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { Navigate, useLocation, useNavigate } from "react-router";
 import PlantFilter from "../../components/page/plants/PlantFilter";
 import PlantCartCard from "../../components/page/plants/PlantCartCard";
 import { usePlantStore } from "../../store/usePlantStore";
 import { useCategoryStore } from "../../store/useCategoryStore";
+import { useAuthStore } from "../../store/useAuthStore";
 
 export default function PlantBrowse() {
+  const { authUser } = useAuthStore();
+
+  if (authUser?.roleName === "Admin") {
+    return <Navigate to="/admin" replace />;
+  }
+
   const { plants = [], loading: plantLoading, getAllPlants } = usePlantStore();
   const { categories = [], getAllCategories } = useCategoryStore();
 

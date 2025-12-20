@@ -10,21 +10,82 @@ export const usePaymentStore = create((set) => ({
   error: null,
   message: null,
 
-  createOrder: async (amount) => {
-    const res = await axiosInstance.post("/payment/create-order", { amount });
-    return res.data;
-  },
+  createRazorpayOrder: async (amount) => {
+    try {
+      set({ loading: true, error: null });
 
-  savePayment: async (data) => {
-    const res = await axiosInstance.post("/payment/save", data);
+      const res = await axiosInstance.post("/payment/create-order", {
+        amount,
+      });
 
-    if (res.data?.success) {
-      const { clearCartItem } = useCartStore.getState();
-      await clearCartItem(data.userId);
+      return res.data;
+    } catch (err) {
+      const message =
+        err.response?.data?.message || "Failed to create payment order";
+      set({ error: message });
+      return { success: false, message };
+    } finally {
+      set({ loading: false });
     }
-
-    return res.data;
   },
+
+  verifyPayment: async ({ orderId, userId, transactionId }) => {
+    try {
+      set({ loading: true, error: null });
+
+      const res = await axiosInstance.post("/payment/verify", {
+        orderId,
+        userId,
+        transactionId,
+      });
+
+      set({ message: res.data?.message || null });
+      return res.data;
+    } catch (err) {
+      const message =
+        err.response?.data?.message || "Payment verification failed";
+      set({ error: message });
+      return { success: false, message };
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  markPaymentFailed: async ({ orderId, userId }) => {
+    try {
+      set({ loading: true, error: null });
+
+      const res = await axiosInstance.post("/payment/failed", {
+        orderId,
+        userId,
+      });
+
+      return res.data;
+    } catch (err) {
+      const message =
+        err.response?.data?.message || "Failed to mark payment as failed";
+      set({ error: message });
+      return { success: false, message };
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  // createOrder: async (amount) => {
+  //   const res = await axiosInstance.post("/payment/create-order", { amount });
+  //   return res.data;
+  // },
+
+  // savePayment: async (data) => {
+  //   const res = await axiosInstance.post("/payment/save", data);
+
+  //   if (res.data?.success) {
+  //     const { clearCartItem } = useCartStore.getState();
+  //     await clearCartItem(data.userId);
+  //   }
+
+  //   return res.data;
+  // },
 
   getAllPayments: async (filters = {}) => {
     try {

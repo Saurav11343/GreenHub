@@ -13,7 +13,7 @@ import {
 export const createOrder = async (req, res) => {
   try {
     /**
-     * 1️⃣ Validate only user-provided fields
+     * 1️⃣ Validate request body
      */
     const validation = createOrderSchema.safeParse(req.body);
     if (!validation.success) {
@@ -41,7 +41,7 @@ export const createOrder = async (req, res) => {
      */
     const cartItems = await CartItem.find({ userId }).populate(
       "plantId",
-      "price name"
+      "price name stockQty"
     );
 
     if (!cartItems.length) {
@@ -52,7 +52,7 @@ export const createOrder = async (req, res) => {
     }
 
     /**
-     * 4️⃣ Calculate total price (SERVER SIDE)
+     * 4️⃣ Calculate total (SERVER SIDE)
      */
     let calculatedTotal = 0;
 
@@ -70,7 +70,7 @@ export const createOrder = async (req, res) => {
     });
 
     /**
-     * 5️⃣ Create order
+     * 5️⃣ Create order (PENDING)
      */
     const newOrder = await Order.create({
       userId,
@@ -90,16 +90,16 @@ export const createOrder = async (req, res) => {
     await OrderDetail.insertMany(orderDetailsWithOrderId);
 
     /**
-     * 7️⃣ Clear cart AFTER successful order creation
+     * ❌ DO NOT CLEAR CART HERE
+     * Cart will be cleared only after PAYMENT SUCCESS
      */
-    await CartItem.deleteMany({ userId });
 
     /**
-     * 8️⃣ Success response
+     * 7️⃣ Success response
      */
     return res.status(201).json({
       success: true,
-      message: "Order created successfully",
+      message: "Order created. Proceed to payment.",
       data: {
         orderId: newOrder._id,
         totalAmount: calculatedTotal,
