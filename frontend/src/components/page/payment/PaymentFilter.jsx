@@ -71,7 +71,6 @@ function PaymentFilter({ onFilter }) {
         >
           <option value="">All</option>
           <option value="Success">Success</option>
-          <option value="Pending">Pending</option>
           <option value="Failed">Failed</option>
         </FormField>
 
@@ -84,8 +83,12 @@ function PaymentFilter({ onFilter }) {
         >
           <option value="">All</option>
           <option value="UPI">UPI</option>
-          <option value="Card">Card</option>
-          <option value="COD">COD</option>
+          <option value="CARD">Card</option>
+          <option value="NETBANKING">Net Banking</option>
+          <option value="WALLET">Wallet</option>
+          <option value="EMI">EMI</option>
+          <option value="PAYLATER">Pay Later</option>
+          <option value="ONLINE">Online (Unknown)</option>
         </FormField>
 
         {/* Min Amount */}

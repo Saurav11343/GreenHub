@@ -20,6 +20,7 @@ export const addToCart = async (req, res) => {
 
     const { userId, plantId, quantity = 1 } = validation.data;
 
+    // 1️⃣ Validate user
     const userExist = await User.findById(userId);
     if (!userExist) {
       return res.status(400).json({
@@ -28,6 +29,7 @@ export const addToCart = async (req, res) => {
       });
     }
 
+    // 2️⃣ Validate plant
     const plantExist = await Plant.findById(plantId);
     if (!plantExist) {
       return res.status(400).json({
@@ -36,9 +38,23 @@ export const addToCart = async (req, res) => {
       });
     }
 
+    // 3️⃣ Check existing cart item
     const existingItem = await CartItem.findOne({ userId, plantId });
+
+    // Calculate final quantity user wants in cart
+    const finalQty = existingItem ? existingItem.quantity + quantity : quantity;
+
+    // 4️⃣ Validate stock (DO NOT DEDUCT)
+    if (finalQty > plantExist.stockQty) {
+      return res.status(400).json({
+        success: false,
+        message: `Only ${plantExist.stockQty} items available in stock`,
+      });
+    }
+
+    // 5️⃣ Update existing cart item
     if (existingItem) {
-      existingItem.quantity += quantity;
+      existingItem.quantity = finalQty;
 
       const updatedItem = await existingItem.save();
       return res.status(200).json({
@@ -48,10 +64,11 @@ export const addToCart = async (req, res) => {
       });
     }
 
+    // 6️⃣ Create new cart item
     const newItem = await CartItem.create({
       userId,
       plantId,
-      quantity,
+      quantity: finalQty,
     });
 
     return res.status(201).json({
@@ -88,7 +105,7 @@ export const getUserCart = async (req, res) => {
     }
 
     const cartItem = await CartItem.find({ userId })
-      .populate("plantId", "name price imageUrl")
+      .populate("plantId", "name price imageUrl stockQty")
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -107,6 +124,7 @@ export const getUserCart = async (req, res) => {
 
 export const updateCartItem = async (req, res) => {
   try {
+    // 1️⃣ Validate cart item id
     const idValidation = cartItemIdSchema.safeParse(req.params);
     if (!idValidation.success) {
       return res.status(400).json({
@@ -117,6 +135,7 @@ export const updateCartItem = async (req, res) => {
 
     const { id } = idValidation.data;
 
+    // 2️⃣ Validate body
     const bodyValidation = updateCartItemSchema.safeParse(req.body);
     if (!bodyValidation.success) {
       return res.status(400).json({
@@ -127,6 +146,7 @@ export const updateCartItem = async (req, res) => {
 
     const { quantity } = bodyValidation.data;
 
+    // 3️⃣ Fetch cart item
     const cartItem = await CartItem.findById(id);
     if (!cartItem) {
       return res.status(404).json({
@@ -135,8 +155,36 @@ export const updateCartItem = async (req, res) => {
       });
     }
 
+    // 4️⃣ Fetch plant for stock validation
+    const plant = await Plant.findById(cartItem.plantId);
+    if (!plant) {
+      return res.status(400).json({
+        success: false,
+        message: "Plant not found",
+      });
+    }
+
+    // 5️⃣ Validate stock (NO deduction)
+    if (quantity > plant.stockQty) {
+      return res.status(400).json({
+        success: false,
+        message: `Only ${plant.stockQty} items available in stock`,
+      });
+    }
+
+    // Optional: if quantity is 0, remove item
+    if (quantity <= 0) {
+      await CartItem.findByIdAndDelete(id);
+      return res.status(200).json({
+        success: true,
+        message: "Cart item removed successfully",
+      });
+    }
+
+    // 6️⃣ Update cart quantity
     cartItem.quantity = quantity;
     const updatedItem = await cartItem.save();
+
     return res.status(200).json({
       success: true,
       message: "Cart item updated successfully",

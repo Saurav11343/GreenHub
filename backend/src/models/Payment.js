@@ -18,9 +18,19 @@ const paymentSchema = new mongoose.Schema(
     },
     method: {
       type: String,
-      enum: ["COD", "UPI", "Card"],
-      default: "COD",
+      enum: [
+        "UPI",
+        "CARD",
+        "NETBANKING",
+        "WALLET",
+        "EMI",
+        "PAYLATER",
+        "ONLINE",
+        "UNKNOWN",
+      ],
+      required: true,
     },
+
     status: {
       type: String,
       enum: ["Pending", "Success", "Failed"],

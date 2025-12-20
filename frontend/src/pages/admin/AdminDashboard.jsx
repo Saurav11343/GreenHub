@@ -37,7 +37,7 @@ function AdminDashboard() {
       <h1 className="text-2xl md:text-3xl font-bold">Admin Dashboard</h1>
 
       {/* SUMMARY CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <DashboardStatCard
           title="Total Orders"
           value={summary.orders.total}
