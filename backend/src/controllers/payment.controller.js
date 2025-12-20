@@ -79,15 +79,8 @@ export const saveOnlinePayment = async (req, res) => {
 };
 export const getAllPayments = async (req, res) => {
   try {
-    const {
-      status,
-      method,
-      userId,
-      minAmount,
-      maxAmount,
-      dateRange, // 👈 from frontend
-      sort,
-    } = req.query;
+    const { status, method, userId, minAmount, maxAmount, dateRange, sort } =
+      req.query;
 
     const filter = {};
 
@@ -156,6 +149,91 @@ export const getAllPayments = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch payments",
+    });
+  }
+};
+
+export const getUserPayments = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const { status, method, minAmount, maxAmount, dateRange, sort } = req.query;
+
+    /* -----------------------------
+        BASE FILTER (USER ONLY)
+    ------------------------------ */
+    const filter = { userId };
+
+    // Status filter
+    if (status) filter.status = status;
+
+    // Method filter
+    if (method) filter.method = method;
+
+    // Amount filter
+    if (minAmount || maxAmount) {
+      filter.amount = {};
+      if (!isNaN(minAmount)) filter.amount.$gte = Number(minAmount);
+      if (!isNaN(maxAmount)) filter.amount.$lte = Number(maxAmount);
+    }
+
+    /* -----------------------------
+        DATE RANGE FILTER
+    ------------------------------ */
+    if (dateRange) {
+      let fromDate;
+      const toDate = new Date();
+      toDate.setHours(23, 59, 59, 999);
+
+      if (dateRange === "today") {
+        fromDate = new Date();
+        fromDate.setHours(0, 0, 0, 0);
+      }
+
+      if (dateRange === "7days") {
+        fromDate = new Date();
+        fromDate.setDate(fromDate.getDate() - 6);
+        fromDate.setHours(0, 0, 0, 0);
+      }
+
+      if (dateRange === "month") {
+        fromDate = new Date();
+        fromDate.setMonth(fromDate.getMonth() - 1);
+        fromDate.setHours(0, 0, 0, 0);
+      }
+
+      filter.createdAt = {
+        $gte: fromDate,
+        $lte: toDate,
+      };
+    }
+
+    /* -----------------------------
+        SORTING
+    ------------------------------ */
+    const sortQuery = sort === "oldest" ? { createdAt: 1 } : { createdAt: -1 };
+
+    /* -----------------------------
+        FETCH PAYMENTS
+    ------------------------------ */
+    const payments = await Payment.find(filter)
+      .populate("orderId", "totalAmount status")
+      .sort(sortQuery)
+      .lean();
+
+    /* -----------------------------
+        RESPONSE
+    ------------------------------ */
+    return res.status(200).json({
+      success: true,
+      totalCount: payments.length,
+      payments,
+    });
+  } catch (error) {
+    console.error("Get user payments error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch user payments",
     });
   }
 };
