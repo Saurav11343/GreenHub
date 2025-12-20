@@ -17,6 +17,7 @@ const ORDER_COLORS = {
   Delivered: "#22c55e",
   Cancelled: "#ef4444",
   Paid: " #3b82f6",
+  Failed: "#ef4444",
 };
 
 function AdminCharts({ summary }) {
@@ -28,6 +29,7 @@ function AdminCharts({ summary }) {
     { name: "Paid", value: summary.orders.paid },
     { name: "Delivered", value: summary.orders.delivered },
     { name: "Cancelled", value: summary.orders.cancelled },
+    { name: "Failed", value: summary.orders.failed },
   ].filter((item) => item.value > 0); // ⬅️ prevents empty slices
 
   /* ---------------- PAYMENTS ---------------- */

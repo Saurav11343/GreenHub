@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useAnalysisStore } from "../../store/useAnalysisStore";
+import { usePlantStockStore } from "../../store/usePlantStockStore";
 import PageLoader from "../../components/loader/PageLoader";
 import AdminCharts from "../../components/page/admin/AdminCharts";
 import DashboardStatCard from "../../components/page/admin/DashboardStatCard";
@@ -8,12 +9,15 @@ function AdminDashboard() {
   const { summary, loading, error, getAdminDashboardSummary } =
     useAnalysisStore();
 
+  const { stockSummary, getStockSummary } = usePlantStockStore();
+
   useEffect(() => {
     getAdminDashboardSummary();
-  }, [getAdminDashboardSummary]);
+    getStockSummary(); // ✅ fetch inventory summary
+  }, [getAdminDashboardSummary, getStockSummary]);
 
   /* ---------------- LOADING STATE ---------------- */
-  if (loading) {
+  if (loading || !stockSummary) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
         <PageLoader />
@@ -37,7 +41,7 @@ function AdminDashboard() {
       <h1 className="text-2xl md:text-3xl font-bold">Admin Dashboard</h1>
 
       {/* SUMMARY CARDS */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         <DashboardStatCard
           title="Total Orders"
           value={summary.orders.total}
@@ -58,6 +62,14 @@ function AdminDashboard() {
           value={`₹${summary.revenue.total}`}
           desc="Successful payments"
           color="success"
+        />
+
+        <DashboardStatCard
+          title="Total Inventory"
+          value={stockSummary.totalInventory}
+          desc="Units in stock"
+          to="/admin/stock"
+          color="secondary"
         />
 
         <DashboardStatCard

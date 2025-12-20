@@ -35,6 +35,10 @@ export const getAdminDashboardSummary = async (req, res) => {
       ...dateFilter,
       status: "Cancelled",
     });
+    const failedOrders = await Order.countDocuments({
+      ...dateFilter,
+      status: "Failed",
+    });
 
     /* ---------------- PAYMENTS ---------------- */
     const totalPayments = await Payment.countDocuments(dateFilter);
@@ -112,6 +116,7 @@ export const getAdminDashboardSummary = async (req, res) => {
           delivered: deliveredOrders,
           paid: paidOrders,
           cancelled: cancelledOrders,
+          failed: failedOrders,
         },
         payments: {
           total: totalPayments,
