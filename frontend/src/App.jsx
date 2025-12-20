@@ -19,6 +19,7 @@ import PaymentDashboard from "./pages/admin/PaymentDashboard";
 import OrderDashboard from "./pages/admin/OrderDashboard";
 import CustomerOrder from "./pages/customer/CustomerOrder";
 import CustomerPayments from "./pages/customer/CustomerPayments";
+import PlantStockDashboard from "./pages/admin/PlantStockDashboard";
 //hello
 function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -62,6 +63,7 @@ function App() {
             <Route path="/admin/plants" element={<ManagePlants />} />
             <Route path="/admin/orders" element={<OrderDashboard />} />
             <Route path="/admin/payments" element={<PaymentDashboard />} />
+            <Route path="/admin/stock" element={<PlantStockDashboard />} />
           </Route>
         </Route>
       </Routes>

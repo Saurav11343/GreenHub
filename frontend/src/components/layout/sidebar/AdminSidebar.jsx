@@ -9,6 +9,7 @@ import {
   Settings,
   LogOut,
   FileChartColumn,
+  Archive,
 } from "lucide-react";
 import { useAuthStore } from "../../../store/useAuthStore";
 
@@ -93,28 +94,15 @@ function AdminSidebar() {
           {/* Customers */}
           <li>
             <button
-              onClick={() => navigate("/admin/customers")}
+              onClick={() => navigate("/admin/stock")}
               className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-              data-tip="Customers"
+              data-tip="Plant Stock"
             >
-              <Users className="size-5" />
-              <span className="is-drawer-close:hidden">Customers</span>
+              <Archive className="size-5" />
+              <span className="is-drawer-close:hidden">Plant Stock</span>
             </button>
           </li>
 
-          {/* Settings */}
-          <li>
-            <button
-              onClick={() => navigate("/admin/settings")}
-              className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-              data-tip="Settings"
-            >
-              <Settings className="size-5" />
-              <span className="is-drawer-close:hidden">Settings</span>
-            </button>
-          </li>
-
-          {/* 🔥 Logout Button (added) */}
           <li className="mt-2">
             <button
               onClick={handleLogout}
