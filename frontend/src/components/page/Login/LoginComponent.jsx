@@ -35,7 +35,7 @@ function LoginComponent() {
         const role = result.user.roleName;
 
         if (role === "Admin") navigate("/admin");
-        else if (role === "Customer") navigate("/customer");
+        else if (role === "Customer") navigate("/plants");
         else navigate("/"); // fallback
       }
     } catch (err) {

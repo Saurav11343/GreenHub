@@ -1,6 +1,9 @@
 import React from "react";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 function OrderCardGrid({ orders }) {
+  const { authUser } = useAuthStore();
+  const role = authUser?.roleName || "Undefined";
   const getStatusBadge = (status) => {
     switch (status) {
       case "Pending":
@@ -86,15 +89,17 @@ function OrderCardGrid({ orders }) {
               </ul>
             </div>
 
-            {/* ACTION */}
-            <div className="flex justify-end pt-1">
-              <button
-                className="btn btn-xs btn-outline btn-primary"
-                onClick={() => console.log("Update order:", order._id)}
-              >
-                Update
-              </button>
-            </div>
+            {/* ACTION (Admin only) */}
+            {role === "Admin" && (
+              <div className="flex justify-end pt-1">
+                <button
+                  className="btn btn-xs btn-outline btn-primary"
+                  onClick={() => console.log("Update order:", order._id)}
+                >
+                  Update
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ))}

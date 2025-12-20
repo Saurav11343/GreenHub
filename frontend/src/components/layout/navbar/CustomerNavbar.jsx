@@ -137,7 +137,14 @@ function CustomerNavbar() {
                 <button onClick={() => navigate("/profile")}>Profile</button>
               </li>
               <li>
-                <button onClick={() => navigate("/orders")}>Orders</button>
+                <button onClick={() => navigate("/customer/orders")}>
+                  Orders
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigate("/customer/payments")}>
+                  Payments
+                </button>
               </li>
               <li>
                 <button onClick={() => navigate("/settings")}>Settings</button>
@@ -192,6 +199,7 @@ function CustomerNavbar() {
             <li>
               <button onClick={() => navigate("/plants")}>Browse Plants</button>
             </li>
+
             <li>
               <button onClick={() => navigate("/contact")}>Contact</button>
             </li>
@@ -294,7 +302,14 @@ function CustomerNavbar() {
                 <button onClick={() => navigate("/profile")}>Profile</button>
               </li>
               <li>
-                <button onClick={() => navigate("/orders")}>Orders</button>
+                <button onClick={() => navigate("/customer/orders")}>
+                  Orders
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigate("/customer/payments")}>
+                  Payments
+                </button>
               </li>
               <li>
                 <button onClick={() => navigate("/settings")}>Settings</button>

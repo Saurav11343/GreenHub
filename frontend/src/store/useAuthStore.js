@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
+import { usePaymentStore } from "./usePaymentStore";
+import { useOrderStore } from "./useOrderStore";
 
 export const useAuthStore = create((set) => ({
   authUser: null,
@@ -42,7 +44,12 @@ export const useAuthStore = create((set) => ({
     try {
       set({ loading: true });
       const response = await axiosInstance.post("/auth/login", data);
-      set({ authUser: response.data.user });
+      const user = response.data.user;
+      set({
+        authUser: response.data.user,
+        userId: user?.userId || null,
+        isCheckingAuth: false,
+      });
       return response.data;
     } catch (err) {
       if (err.response) return err.response.data;
@@ -56,8 +63,11 @@ export const useAuthStore = create((set) => ({
     try {
       set({ logoutLoading: true });
       const response = await axiosInstance.post("/auth/logout");
+      usePaymentStore.getState().clearPayment();
+      useOrderStore.getState().clearOrders();
       set({
         authUser: null,
+        userId: null,
         isCheckingAuth: false,
       });
 

@@ -17,6 +17,8 @@ import PlantDetail from "./pages/customer/PlantDetail";
 import CheckOut from "./pages/customer/CheckOut";
 import PaymentDashboard from "./pages/admin/PaymentDashboard";
 import OrderDashboard from "./pages/admin/OrderDashboard";
+import CustomerOrder from "./pages/customer/CustomerOrder";
+import CustomerPayments from "./pages/customer/CustomerPayments";
 //hello
 function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -46,8 +48,9 @@ function App() {
 
           {/* Customer protected pages */}
           <Route element={<ProtectRoutes allowedRoles={["Customer"]} />}>
-            <Route path="/customer" element={<CustomerPage />} />
             <Route path="/customer/checkout/:id" element={<CheckOut />} />
+            <Route path="/customer/orders/" element={<CustomerOrder />} />
+            <Route path="/customer/payments/" element={<CustomerPayments />} />
           </Route>
         </Route>
 
