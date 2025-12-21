@@ -5,7 +5,6 @@ import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import { useAuthStore } from "./store/useAuthStore";
 import PageLoader from "./components/loader/PageLoader";
-import CustomerPage from "./pages/customer/CustomerPage";
 import ProtectRoutes from "./lib/ProtectRoutes";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import RootLayout from "./components/layout/layouts/RootLayout";
