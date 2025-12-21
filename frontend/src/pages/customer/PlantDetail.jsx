@@ -229,9 +229,13 @@ export default function PlantDetail() {
             <h3 className="font-semibold text-lg flex items-center gap-2">
               <Leaf size={18} className="text-emerald-600" /> Care Instructions
             </h3>
-            <pre className="mt-2 p-3 rounded whitespace-pre-wrap">
-              {plant.careInstructions || "No care instructions provided."}
-            </pre>
+
+            <button
+              onClick={() => navigate(`/customer/plantcare/${plant._id}`)}
+              className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-emerald-600 text-emerald-600 hover:bg-emerald-50 transition font-medium"
+            >
+              View full plant care guide →
+            </button>
           </section>
 
           {/* Cart Section */}

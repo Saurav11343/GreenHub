@@ -1,8 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router";
 import HeroBgImage from "../../../assets/heroBackgroundImage.webp";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 function HeroSection() {
+  const { userId } = useAuthStore();
   const navigate = useNavigate();
   return (
     <div
@@ -32,7 +34,10 @@ function HeroSection() {
 
           {/* Buttons */}
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-4">
-            <button className="btn btn-success btn-wide text-white font-semibold shadow-lg">
+            <button
+              onClick={() => navigate(`/customer/checkout/${userId}`)}
+              className="btn btn-success btn-wide text-white font-semibold shadow-lg"
+            >
               Shop Now
             </button>
 

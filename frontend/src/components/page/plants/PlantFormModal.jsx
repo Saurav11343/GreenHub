@@ -44,7 +44,6 @@ function PlantFormModal({
       price: undefined,
       stockQty: undefined,
       description: "",
-      careInstructions: "",
       imageUrl: "",
     },
   });
@@ -111,7 +110,6 @@ function PlantFormModal({
             ? Number(initialData.stockQty)
             : undefined,
         description: initialData.description ?? "",
-        careInstructions: initialData.careInstructions ?? "",
         imageUrl: initialData.imageUrl ?? "",
       });
       setPreviewImg(initialData.imageUrl ?? null);
@@ -261,15 +259,7 @@ function PlantFormModal({
             error={errors.description}
           />
 
-          <FormField
-            label="Care Instructions"
-            as="textarea"
-            rows={3}
-            register={register}
-            registerName="careInstructions"
-            placeholder="e.g., water weekly, partial shade"
-            error={errors.careInstructions}
-          />
+
 
           {/* Hidden imageUrl field rendered via FormField */}
           <FormField

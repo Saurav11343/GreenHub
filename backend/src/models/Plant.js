@@ -21,8 +21,13 @@ const plantSchema = new mongoose.Schema(
       default: "",
     },
     careInstructions: {
-      type: String,
-      default: "",
+      watering: { type: String, default: "" },
+      sunlight: { type: String, default: "" },
+      soil: { type: String, default: "" },
+      temperature: { type: String, default: "" },
+      pestCare: { type: String, default: "" },
+      pruning: { type: String, default: "" },
+      repotting: { type: String, default: "" },
     },
     stockQty: {
       type: Number,
