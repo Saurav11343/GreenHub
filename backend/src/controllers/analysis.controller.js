@@ -19,33 +19,45 @@ export const getAdminDashboardSummary = async (req, res) => {
 
     /* ---------------- ORDERS ---------------- */
     const totalOrders = await Order.countDocuments(dateFilter);
-    const pendingOrders = await Order.countDocuments({
+
+    const paymentPendingOrders = await Order.countDocuments({
       ...dateFilter,
-      status: "Pending",
+      status: "PaymentPending",
     });
-    const paidOrders = await Order.countDocuments({
+
+    const confirmedOrders = await Order.countDocuments({
       ...dateFilter,
-      status: "Paid",
+      status: "Confirmed",
     });
+
+    const shippedOrders = await Order.countDocuments({
+      ...dateFilter,
+      status: "Shipped",
+    });
+
     const deliveredOrders = await Order.countDocuments({
       ...dateFilter,
       status: "Delivered",
     });
+
     const cancelledOrders = await Order.countDocuments({
       ...dateFilter,
       status: "Cancelled",
     });
-    const failedOrders = await Order.countDocuments({
+
+    const paymentFailedOrders = await Order.countDocuments({
       ...dateFilter,
-      status: "Failed",
+      status: "PaymentFailed",
     });
 
     /* ---------------- PAYMENTS ---------------- */
     const totalPayments = await Payment.countDocuments(dateFilter);
+
     const successfulPayments = await Payment.countDocuments({
       ...dateFilter,
       status: "Success",
     });
+
     const failedPayments = await Payment.countDocuments({
       ...dateFilter,
       status: "Failed",
@@ -53,7 +65,12 @@ export const getAdminDashboardSummary = async (req, res) => {
 
     /* ---------------- REVENUE ---------------- */
     const revenueAgg = await Payment.aggregate([
-      { $match: { status: "Success", ...dateFilter } },
+      {
+        $match: {
+          status: "Success",
+          ...(dateFilter.createdAt && { createdAt: dateFilter.createdAt }),
+        },
+      },
       {
         $group: {
           _id: null,
@@ -71,7 +88,7 @@ export const getAdminDashboardSummary = async (req, res) => {
     /* ---------------- PLANTS ---------------- */
     const totalPlants = await Plant.countDocuments();
     const outOfStockPlants = await Plant.countDocuments({
-      stock: { $lte: 0 },
+      stockQty: { $lte: 0 },
     });
 
     /* ---------------- CATEGORIES ---------------- */
@@ -107,16 +124,17 @@ export const getAdminDashboardSummary = async (req, res) => {
     ]);
 
     /* ---------------- RESPONSE ---------------- */
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       summary: {
         orders: {
           total: totalOrders,
-          pending: pendingOrders,
+          paymentPending: paymentPendingOrders,
+          confirmed: confirmedOrders,
+          shipped: shippedOrders,
           delivered: deliveredOrders,
-          paid: paidOrders,
           cancelled: cancelledOrders,
-          failed: failedOrders,
+          paymentFailed: paymentFailedOrders,
         },
         payments: {
           total: totalPayments,
@@ -142,7 +160,7 @@ export const getAdminDashboardSummary = async (req, res) => {
     });
   } catch (error) {
     console.error("Admin dashboard summary error:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to load dashboard summary",
     });

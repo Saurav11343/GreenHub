@@ -13,11 +13,12 @@ import {
 } from "recharts";
 
 const ORDER_COLORS = {
-  Pending: "#facc15",
-  Delivered: "#22c55e",
-  Cancelled: "#ef4444",
-  Paid: " #3b82f6",
-  Failed: "#ef4444",
+  PaymentPending: "#facc15", // yellow
+  Confirmed: "#3b82f6", // blue
+  Shipped: "#8b5cf6", // purple
+  Delivered: "#22c55e", // green
+  Cancelled: "#ef4444", // red
+  PaymentFailed: "#f97316", // orange
 };
 
 function AdminCharts({ summary }) {
@@ -25,13 +26,37 @@ function AdminCharts({ summary }) {
 
   /* ---------------- ORDER STATUS ---------------- */
   const orderData = [
-    { name: "Pending", value: summary.orders.pending },
-    { name: "Paid", value: summary.orders.paid },
-    { name: "Delivered", value: summary.orders.delivered },
-    { name: "Cancelled", value: summary.orders.cancelled },
-    { name: "Failed", value: summary.orders.failed },
-  ].filter((item) => item.value > 0); // ⬅️ prevents empty slices
-
+    {
+      name: "Payment Pending",
+      value: summary.orders.paymentPending,
+      key: "PaymentPending",
+    },
+    {
+      name: "Confirmed",
+      value: summary.orders.confirmed,
+      key: "Confirmed",
+    },
+    {
+      name: "Shipped",
+      value: summary.orders.shipped,
+      key: "Shipped",
+    },
+    {
+      name: "Delivered",
+      value: summary.orders.delivered,
+      key: "Delivered",
+    },
+    {
+      name: "Cancelled",
+      value: summary.orders.cancelled,
+      key: "Cancelled",
+    },
+    {
+      name: "Payment Failed",
+      value: summary.orders.paymentFailed,
+      key: "PaymentFailed",
+    },
+  ].filter((item) => item.value > 0);
   /* ---------------- PAYMENTS ---------------- */
   const paymentData = [
     { name: "Success", value: summary.payments.success },
@@ -64,9 +89,10 @@ function AdminCharts({ summary }) {
                   label
                 >
                   {orderData.map((entry, index) => (
-                    <Cell key={index} fill={ORDER_COLORS[entry.name]} />
+                    <Cell key={index} fill={ORDER_COLORS[entry.key]} />
                   ))}
                 </Pie>
+
                 <Tooltip />
                 <Legend />
               </PieChart>

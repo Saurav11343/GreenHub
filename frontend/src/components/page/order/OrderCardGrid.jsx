@@ -6,16 +6,24 @@ function OrderCardGrid({ orders }) {
   const role = authUser?.roleName || "Undefined";
   const getStatusBadge = (status) => {
     switch (status) {
-      case "Pending":
-        return "badge-warning";
+      case "PaymentPending":
+        return "badge-warning"; // waiting for payment
+
+      case "Confirmed":
+        return "badge-primary"; // payment confirmed
+
       case "Shipped":
-        return "badge-info";
+        return "badge-info"; // dispatched
+
       case "Delivered":
-        return "badge-success";
+        return "badge-success"; // delivered
+
       case "Cancelled":
-        return "badge-error";
-      case "Paid":
-        return "badge-primary";
+        return "badge-error"; // cancelled
+
+      case "PaymentFailed":
+        return "badge-outline badge-error"; // payment failed
+
       default:
         return "badge-neutral";
     }

@@ -76,7 +76,7 @@ export const createOrder = async (req, res) => {
       userId,
       totalAmount: calculatedTotal,
       shippingAddress,
-      status: "Pending",
+      status: "PaymentPending",
     });
 
     /**
@@ -227,16 +227,6 @@ export const updateOrderStatus = async (req, res) => {
 
     const { id: orderId } = idValidation.data;
 
-    const bodyValidation = updateOrderStatusSchema.safeParse(req.body);
-    if (!bodyValidation.success) {
-      return res.status(400).json({
-        success: false,
-        errors: bodyValidation.error.flatten().fieldErrors,
-      });
-    }
-
-    const { status } = bodyValidation.data;
-
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({
@@ -245,16 +235,38 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
 
-    order.status = status;
+    // ❌ Block final states
+    if (["Delivered", "Cancelled", "PaymentFailed"].includes(order.status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Order cannot be updated when status is ${order.status}`,
+      });
+    }
+
+    // ✅ Confirmed → Shipped
+    if (order.status === "Confirmed") {
+      order.status = "Shipped";
+    }
+    // ✅ Shipped → Delivered
+    else if (order.status === "Shipped") {
+      order.status = "Delivered";
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Order is not ready for status progression",
+      });
+    }
+
+    order.statusUpdatedAt = new Date();
     const updatedOrder = await order.save();
 
     return res.status(200).json({
       success: true,
-      message: "Order status updated successfully",
+      message: `Order status updated to ${updatedOrder.status}`,
       order: updatedOrder,
     });
   } catch (error) {
-    console.log("Error in updateOrderStatus controller:", error);
+    console.error("Error in updateOrderStatus:", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -282,21 +294,22 @@ export const cancelOrder = async (req, res) => {
       });
     }
 
-    if (order.status === "Delivered") {
+    // ❌ Disallow cancellation in final states
+    if (
+      ["Shipped", "Delivered", "Cancelled", "PaymentFailed"].includes(
+        order.status
+      )
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Delivered orders cannot be cancelled",
+        message: `Order cannot be cancelled when status is ${order.status}`,
       });
     }
 
-    if (order.status === "Cancelled") {
-      return res.status(400).json({
-        success: false,
-        message: "Order is already cancelled",
-      });
-    }
-
+    // ✅ Allowed: PaymentPending / Confirmed
     order.status = "Cancelled";
+    order.statusUpdatedAt = new Date();
+
     const cancelledOrder = await order.save();
 
     return res.status(200).json({
@@ -305,7 +318,7 @@ export const cancelOrder = async (req, res) => {
       order: cancelledOrder,
     });
   } catch (error) {
-    console.log("Error in cancelOrder controller:", error);
+    console.error("Error in cancelOrder controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
