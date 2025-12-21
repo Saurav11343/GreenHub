@@ -18,7 +18,7 @@ function AdminDashboard() {
 
   if (loading || !stockSummary) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center">
+      <div className="min-h-[60vh] flex items-center justify-center px-4">
         <PageLoader />
       </div>
     );
@@ -26,19 +26,34 @@ function AdminDashboard() {
 
   if (error) {
     return (
-      <div className="p-6 text-center text-red-500 font-medium">{error}</div>
+      <div className="p-4 md:p-6 text-center text-red-500 font-medium">
+        {error}
+      </div>
     );
   }
 
   if (!summary) return null;
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* HEADER */}
-      <h1 className="text-2xl md:text-3xl font-bold">Admin Dashboard</h1>
+    <div className="p-3 sm:p-4 md:p-6 space-y-6">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
+          Admin Dashboard
+        </h1>
+      </div>
 
-      {/* SUMMARY CARDS */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div
+        className="
+          grid
+          grid-cols-1
+          xs:grid-cols-2
+          sm:grid-cols-2
+          md:grid-cols-3
+          lg:grid-cols-4
+          xl:grid-cols-6
+          gap-3
+        "
+      >
         <DashboardStatCard
           title="Total Orders"
           value={summary.orders.total}
@@ -62,7 +77,7 @@ function AdminDashboard() {
         />
 
         <DashboardStatCard
-          title="Total Inventory"
+          title="Inventory"
           value={stockSummary.totalInventory}
           desc="Units in stock"
           to="/admin/stock"
@@ -93,8 +108,9 @@ function AdminDashboard() {
         />
       </div>
 
-      {/* CHARTS */}
-      <AdminCharts summary={summary} />
+      <div className="w-full overflow-x-hidden">
+        <AdminCharts summary={summary} />
+      </div>
     </div>
   );
 }

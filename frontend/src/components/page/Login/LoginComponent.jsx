@@ -27,8 +27,6 @@ function LoginComponent() {
     try {
       const result = await login(data);
 
-      console.log(result);
-
       toast[result.success ? "success" : "error"](result.message);
 
       if (result.success) {
@@ -36,7 +34,7 @@ function LoginComponent() {
 
         if (role === "Admin") navigate("/admin");
         else if (role === "Customer") navigate("/plants");
-        else navigate("/"); 
+        else navigate("/");
       }
     } catch (err) {
       console.error(err);

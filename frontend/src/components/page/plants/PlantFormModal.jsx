@@ -135,7 +135,6 @@ function PlantFormModal({
           formData.categoryId._id ?? formData.categoryId.id ?? "";
       }
 
-      console.log(formData);
       await onSubmit(formData);
     } catch (err) {
       console.error("Save plant failed:", err);
