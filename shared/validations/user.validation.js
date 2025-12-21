@@ -33,7 +33,7 @@ export const signupValidationSchema = z
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
-    path: ["confirmPassword"], // ❗ error goes to confirmPassword
+    path: ["confirmPassword"], // error goes to confirmPassword
   });
 
 export const loginValidationSchema = z.object({
