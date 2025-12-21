@@ -1,35 +1,68 @@
 import React from "react";
+import toast from "react-hot-toast";
 import { useAuthStore } from "../../../store/useAuthStore";
+import { useOrderStore } from "../../../store/useOrderStore";
 
-function OrderCardGrid({ orders }) {
+function OrderCardGrid({ orders, onRefresh }) {
   const { authUser } = useAuthStore();
   const role = authUser?.roleName || "Undefined";
+
+  const { updateOrderStatus, cancelOrder } = useOrderStore();
+
+  /* ---------------- STATUS BADGE ---------------- */
   const getStatusBadge = (status) => {
     switch (status) {
       case "PaymentPending":
-        return "badge-warning"; // waiting for payment
-
+        return "badge-warning";
       case "Confirmed":
-        return "badge-primary"; // payment confirmed
-
+        return "badge-primary";
       case "Shipped":
-        return "badge-info"; // dispatched
-
+        return "badge-info";
       case "Delivered":
-        return "badge-success"; // delivered
-
+        return "badge-success";
       case "Cancelled":
-        return "badge-error"; // cancelled
-
+        return "badge-error";
       case "PaymentFailed":
-        return "badge-outline badge-error"; // payment failed
-
+        return "badge badge-error badge-outline";
       default:
         return "badge-neutral";
     }
   };
 
-  if (orders.length === 0) {
+  /* ---------------- PERMISSION HELPERS ---------------- */
+  const canCustomerCancel = (status) =>
+    ["PaymentPending", "Confirmed"].includes(status);
+
+  const getAdminActionLabel = (status) => {
+    if (status === "Confirmed") return "Ship";
+    if (status === "Shipped") return "Deliver";
+    return null;
+  };
+
+  /* ---------------- HANDLERS ---------------- */
+  const handleCancel = async (orderId) => {
+    const res = await cancelOrder(orderId);
+
+    if (res?.success) {
+      toast.success(res.message || "Order cancelled successfully");
+      await onRefresh();
+    } else {
+      toast.error(res?.message || "Failed to cancel order");
+    }
+  };
+
+  const handleAdminUpdate = async (orderId) => {
+    const res = await updateOrderStatus(orderId);
+
+    if (res?.success) {
+      toast.success(res.message || "Order status updated");
+      await onRefresh();
+    } else {
+      toast.error(res?.message || "Failed to update order");
+    }
+  };
+
+  if (!orders || orders.length === 0) {
     return (
       <div className="text-center py-10 text-gray-500">
         No orders match the selected filters
@@ -39,78 +72,92 @@ function OrderCardGrid({ orders }) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {orders.map((order) => (
-        <div
-          key={order._id}
-          className="bg-base-100 border rounded-lg shadow-md hover:shadow-lg transition-shadow"
-        >
-          <div className="p-4 space-y-3">
-            {/* TOP */}
-            <div className="flex justify-between items-start">
-              <div>
-                <h2 className="font-semibold text-sm">
-                  {order.userId?.firstName} {order.userId?.lastName}
-                </h2>
-                <p className="text-xs text-gray-500 truncate max-w-[180px]">
-                  {order.userId?.email}
-                </p>
+      {orders.map((order) => {
+        const adminAction = getAdminActionLabel(order.status);
+
+        return (
+          <div
+            key={order._id}
+            className="bg-base-100 border rounded-md shadow-sm hover:shadow-md transition"
+          >
+            <div className="p-3 flex flex-col gap-2 text-xs">
+              {/* ================= HEADER ================= */}
+              <div className="flex justify-between items-start gap-2">
+                <div className="min-w-0">
+                  <p className="font-semibold truncate">
+                    {order.userId?.firstName} {order.userId?.lastName}
+                  </p>
+                  <p className="text-gray-500 truncate">
+                    {order.userId?.email}
+                  </p>
+                </div>
+
+                <span
+                  className={`badge badge-xs ${getStatusBadge(
+                    order.status || "PaymentPending"
+                  )}`}
+                >
+                  {order.status}
+                </span>
               </div>
 
-              <span
-                className={`badge badge-sm ${getStatusBadge(
-                  order.status || "Pending"
-                )}`}
-              >
-                {order.status || "Pending"}
-              </span>
-            </div>
+              {/* ================= META ================= */}
+              <div className="flex justify-between text-[11px] text-gray-600">
+                <span>
+                  <strong>ID:</strong>{" "}
+                  <span className="truncate inline-block max-w-[90px] align-bottom">
+                    {order._id}
+                  </span>
+                </span>
+                <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+              </div>
 
-            {/* INFO */}
-            <div className="text-xs space-y-1">
-              <p className="truncate">
-                <strong>ID:</strong> {order._id}
-              </p>
-              <p>
-                <strong>Total:</strong>{" "}
-                <span className="font-semibold">₹{order.totalAmount}</span>
-              </p>
-              <p>
-                <strong>Date:</strong>{" "}
-                {new Date(order.createdAt).toLocaleDateString()}
-              </p>
-            </div>
+              {/* ================= TOTAL ================= */}
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Total</span>
+                <span className="font-bold text-sm">₹{order.totalAmount}</span>
+              </div>
 
-            {/* ITEMS */}
-            <div>
-              <p className="text-xs font-semibold mb-1">Items</p>
-              <ul className="list-disc ml-4 text-xs space-y-0.5">
-                {order.items?.slice(0, 3).map((item) => (
+              {/* ================= ITEMS ================= */}
+              <ul className="list-disc ml-4 space-y-0.5 text-[11px]">
+                {order.items?.slice(0, 2).map((item) => (
                   <li key={item._id} className="truncate">
                     {item.plantId?.name} × {item.quantity}
                   </li>
                 ))}
-                {order.items?.length > 3 && (
-                  <li className="text-gray-400 italic">
-                    +{order.items.length - 3} more
+                {order.items?.length > 2 && (
+                  <li className="italic text-gray-400">
+                    +{order.items.length - 2} more
                   </li>
                 )}
               </ul>
-            </div>
 
-            {/* ACTION (Admin only) */}
-            {role === "Admin" && (
-              <div className="flex justify-end pt-1">
-                <button
-                  className="btn btn-xs btn-outline btn-primary"
-                  onClick={() => console.log("Update order:", order._id)}
-                >
-                  Update
-                </button>
+              {/* ================= ACTIONS ================= */}
+              <div className="flex justify-end gap-1 pt-1">
+                {/* CUSTOMER CANCEL */}
+                {role === "Customer" && canCustomerCancel(order.status) && (
+                  <button
+                    className="btn btn-xs btn-outline btn-error"
+                    onClick={() => handleCancel(order._id)}
+                  >
+                    Cancel
+                  </button>
+                )}
+
+                {/* ADMIN ACTION */}
+                {role === "Admin" && adminAction && (
+                  <button
+                    className="btn btn-xs btn-outline btn-primary"
+                    onClick={() => handleAdminUpdate(order._id)}
+                  >
+                    {adminAction}
+                  </button>
+                )}
               </div>
-            )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

@@ -92,7 +92,10 @@ function CustomerOrder() {
 
       <div className="rounded overflow-hidden">
         <div className="max-h-[70vh] md:max-h-[58vh] overflow-y-auto hide-scrollbar">
-          <OrderCardGrid orders={filteredOrders} />
+          <OrderCardGrid
+            orders={filteredOrders}
+            onRefresh={() => getUserOrders(userId)}
+          />
         </div>
       </div>
     </div>
