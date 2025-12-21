@@ -27,6 +27,7 @@ const loadRazorpay = () => {
 function Payment({ orderId, onClose }) {
   const navigate = useNavigate();
   const hasOpenedRef = useRef(false);
+  const paymentCompletedRef = useRef(false);
 
   const [loading, setLoading] = useState(true);
 
@@ -70,6 +71,8 @@ function Payment({ orderId, onClose }) {
           order_id: rpRes.order.id,
 
           handler: async (response) => {
+            paymentCompletedRef.current = true;
+
             const verifyRes = await verifyPayment({
               orderId: order._id,
               userId,
@@ -87,16 +90,18 @@ function Payment({ orderId, onClose }) {
 
           modal: {
             ondismiss: async () => {
+              // 🚫 Do nothing if payment already succeeded
+              if (paymentCompletedRef.current) return;
+
               await markPaymentFailed({
                 orderId: order._id,
                 userId,
               });
+
               toast("Payment cancelled");
               onClose();
             },
           },
-
-          theme: { color: "#16a34a" },
         };
 
         const rzp = new window.Razorpay(options);

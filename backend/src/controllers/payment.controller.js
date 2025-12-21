@@ -115,8 +115,8 @@ export const verifyAndCompletePayment = async (req, res) => {
     const order = await Order.findById(orderId).session(session);
     if (!order) throw new Error("Order not found");
 
-    if (order.status === "Paid") {
-      throw new Error("Order already paid");
+    if (order.status !== "PaymentPending") {
+      throw new Error("Order is not awaiting payment");
     }
 
     /* -----------------------------
@@ -177,7 +177,14 @@ export const verifyAndCompletePayment = async (req, res) => {
     /* -----------------------------
        6️⃣ UPDATE ORDER STATUS
     ------------------------------ */
-    await Order.updateOne({ _id: orderId }, { status: "Paid" }, { session });
+    await Order.updateOne(
+      { _id: orderId },
+      {
+        status: "Confirmed",
+        statusUpdatedAt: new Date(),
+      },
+      { session }
+    );
 
     /* -----------------------------
        7️⃣ CLEAR CART (ONLY AFTER SUCCESS)
@@ -221,10 +228,10 @@ export const markPaymentFailed = async (req, res) => {
     }
 
     // 🚫 NEVER mark a paid order as failed
-    if (order.status === "Paid") {
+    if (order.status !== "PaymentPending") {
       return res.status(400).json({
         success: false,
-        message: "Order already paid",
+        message: "Order is not awaiting payment",
       });
     }
 
@@ -244,7 +251,13 @@ export const markPaymentFailed = async (req, res) => {
       });
     }
 
-    await Order.updateOne({ _id: orderId }, { status: "Failed" });
+    await Order.updateOne(
+      { _id: orderId },
+      {
+        status: "PaymentFailed",
+        statusUpdatedAt: new Date(),
+      }
+    );
 
     return res.json({
       success: true,

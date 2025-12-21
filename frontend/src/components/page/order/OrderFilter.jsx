@@ -38,11 +38,12 @@ function OrderFilter({ filters, onChange, onReset }) {
             }
           >
             <option value="">All</option>
-            <option value="Pending">Pending</option>
+            <option value="PaymentPending">Payment Pending</option>
+            <option value="Confirmed">Confirmed</option>
             <option value="Shipped">Shipped</option>
             <option value="Delivered">Delivered</option>
             <option value="Cancelled">Cancelled</option>
-            <option value="Paid">Paid</option>
+            <option value="PaymentFailed">Payment Failed</option>
           </select>
         </div>
 
