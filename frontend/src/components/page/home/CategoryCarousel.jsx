@@ -21,17 +21,26 @@ function CategoryCarousel() {
   };
 
   return (
-    <section className="py-12 bg-base-100">
-      <h2 className="text-3xl font-bold text-center mb-10">
-        Shop by Categories
-      </h2>
+    <section className="bg-base-200 py-12 sm:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        {/* HEADER */}
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl lg:text-5xl font-bold">
+            Shop by Categories
+          </h2>
+          <p className="mt-3 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base opacity-80">
+            Explore a wide range of plant categories and find the perfect
+            greenery for your home, garden, or workspace.
+          </p>
+        </div>
 
-      <div className="container mx-auto px-6">
+        {/* CONTENT */}
         {loading && (
           <p className="text-center opacity-70 text-sm">
             Loading categories...
           </p>
         )}
+
         {!loading && categories.length === 0 && (
           <p className="text-center opacity-70 text-sm">
             No categories available
@@ -42,7 +51,7 @@ function CategoryCarousel() {
           <Swiper
             slidesPerView={4}
             spaceBetween={20}
-            loop={true}
+            loop
             autoplay={{ delay: 2500, disableOnInteraction: false }}
             modules={[Autoplay]}
             breakpoints={{
@@ -50,11 +59,12 @@ function CategoryCarousel() {
               640: { slidesPerView: 3, spaceBetween: 15 },
               1024: { slidesPerView: 4, spaceBetween: 20 },
             }}
+            className="pb-4"
           >
             {categories.map((cat) => (
               <SwiperSlide key={cat._id}>
-                <div
-                  className="cursor-pointer"
+                <button
+                  className="w-full cursor-pointer"
                   onClick={() => handleCategoryClick(cat._id)}
                 >
                   <CategoryCard
@@ -62,7 +72,7 @@ function CategoryCarousel() {
                     icon={cat.icon}
                     image={cat.imageUrl || "/plant.webp"}
                   />
-                </div>
+                </button>
               </SwiperSlide>
             ))}
           </Swiper>

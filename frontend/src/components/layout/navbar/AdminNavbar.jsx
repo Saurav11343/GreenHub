@@ -45,13 +45,13 @@ function AdminNavbar() {
             tabIndex={0}
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow"
           >
-            <li>
+            {/* <li>
               <a onClick={() => navigate("/admin/profile")}>Profile</a>
             </li>
 
             <li>
               <a onClick={() => navigate("/admin/settings")}>Settings</a>
-            </li>
+            </li> */}
 
             <li>
               <a

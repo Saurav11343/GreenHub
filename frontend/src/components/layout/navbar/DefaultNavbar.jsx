@@ -96,7 +96,7 @@ function DefaultNavbar() {
             <li>
               <button
                 className="w-full text-left"
-                onClick={() => navigate("/contact")}
+                onClick={() => navigate("/contactUs")}
               >
                 Contact
               </button>
@@ -183,7 +183,7 @@ function DefaultNavbar() {
 
           <li>
             <button
-              onClick={() => navigate("/contact")}
+              onClick={() => navigate("/contactUs")}
               className="font-medium cursor-pointer"
             >
               Contact

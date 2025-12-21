@@ -131,11 +131,11 @@ function CustomerNavbar() {
                 </button>
               </li>
               <li>
-                <button onClick={() => navigate("/contact")}>Contact</button>
+                <button onClick={() => navigate("/contactUs")}>Contact</button>
               </li>
-              <li>
+              {/* <li>
                 <button onClick={() => navigate("/profile")}>Profile</button>
-              </li>
+              </li> */}
               <li>
                 <button onClick={() => navigate("/customer/orders")}>
                   Orders
@@ -146,9 +146,9 @@ function CustomerNavbar() {
                   Payments
                 </button>
               </li>
-              <li>
+              {/* <li>
                 <button onClick={() => navigate("/settings")}>Settings</button>
-              </li>
+              </li> */}
 
               <li>
                 <button onClick={handleLogout} className="text-error">
@@ -201,7 +201,7 @@ function CustomerNavbar() {
             </li>
 
             <li>
-              <button onClick={() => navigate("/contact")}>Contact</button>
+              <button onClick={() => navigate("/contactUs")}>Contact</button>
             </li>
           </ul>
         </div>
@@ -298,9 +298,9 @@ function CustomerNavbar() {
             </div>
 
             <ul className="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow">
-              <li>
+              {/* <li>
                 <button onClick={() => navigate("/profile")}>Profile</button>
-              </li>
+              </li> */}
               <li>
                 <button onClick={() => navigate("/customer/orders")}>
                   Orders
@@ -311,9 +311,9 @@ function CustomerNavbar() {
                   Payments
                 </button>
               </li>
-              <li>
+              {/* <li>
                 <button onClick={() => navigate("/settings")}>Settings</button>
-              </li>
+              </li> */}
               <li>
                 <button onClick={handleLogout} className="text-error">
                   Logout

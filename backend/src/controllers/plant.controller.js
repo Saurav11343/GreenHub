@@ -323,3 +323,126 @@ export const getPlantByCategory = async (req, res) => {
     });
   }
 };
+
+export const updateCareInstructions = async (req, res) => {
+  try {
+    const { plantId } = req.params;
+    const updates = req.body;
+
+    const allowedKeys = [
+      "watering",
+      "sunlight",
+      "soil",
+      "temperature",
+      "pestCare",
+      "pruning",
+      "repotting",
+    ];
+
+    const setObj = {};
+    for (const key of allowedKeys) {
+      if (updates[key] !== undefined) {
+        setObj[`careInstructions.${key}`] = updates[key];
+      }
+    }
+
+    if (Object.keys(setObj).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid care instruction fields provided",
+      });
+    }
+
+    // 🔴 STEP 1: Fetch plant
+    const plant = await Plant.findById(plantId);
+    if (!plant) {
+      return res.status(404).json({
+        success: false,
+        message: "Plant not found",
+      });
+    }
+
+    // 🔴 STEP 2: Normalize old data (string → object)
+    if (
+      typeof plant.careInstructions !== "object" ||
+      plant.careInstructions === null
+    ) {
+      plant.careInstructions = {};
+      await plant.save();
+    }
+
+    // 🔴 STEP 3: Apply update
+    const updatedPlant = await Plant.findByIdAndUpdate(
+      plantId,
+      { $set: setObj },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Care instructions updated successfully",
+      data: updatedPlant.careInstructions,
+    });
+  } catch (error) {
+    console.error("Update care instructions error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getAllPlantCareTips = async (req, res) => {
+  try {
+    const plants = await Plant.find(
+      {},
+      {
+        name: 1,
+        careInstructions: 1,
+      }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Plant care tips fetched successfully",
+      total: plants.length,
+      data: plants,
+    });
+  } catch (error) {
+    console.error("Get all plant care tips error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getPlantCareTipById = async (req, res) => {
+  try {
+    const { plantId } = req.params;
+
+    const plant = await Plant.findById(plantId, {
+      name: 1,
+      careInstructions: 1,
+    });
+
+    if (!plant) {
+      return res.status(404).json({
+        success: false,
+        message: "Plant not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Plant care tips fetched successfully",
+      data: plant,
+    });
+  } catch (error) {
+    console.error("Get plant care tip error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};

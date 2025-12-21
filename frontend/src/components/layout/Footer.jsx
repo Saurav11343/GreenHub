@@ -1,15 +1,25 @@
-import React from "react";
+import { Link } from "react-router";
+import { useAuthStore } from "../../store/useAuthStore";
 
 function Footer() {
+  const { userId } = useAuthStore();
   return (
     <div>
       <footer className="footer footer-horizontal footer-center bg-base-200 text-base-content rounded p-10">
-        {/* Navigation Links */}
         <nav className="grid grid-flow-col gap-4">
-          <a className="link link-hover">About GreenHub</a>
-          <a className="link link-hover">Shop Plants</a>
-          <a className="link link-hover">Plant Care Tips</a>
-          <a className="link link-hover">Contact Us</a>
+          <Link to="/aboutUs" className="link link-hover">
+            About GreenHub
+          </Link>
+          <Link to={`/customer/checkout/${userId}`} className="link link-hover">
+            Shop Plants
+          </Link>
+
+          <Link to="/customer/plantCare" className="link link-hover">
+            Plant Care Tips
+          </Link>
+          <Link to="/contactUs" className="link link-hover">
+            Contact Us
+          </Link>
         </nav>
 
         {/* Social Icons */}

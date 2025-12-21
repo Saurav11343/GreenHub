@@ -61,8 +61,11 @@ function FormField({
           {...props}
           rows={rows}
           placeholder={placeholder}
+          readOnly={props.readOnly}
           className={`textarea textarea-bordered w-full ${
             error ? "textarea-error" : ""
+          } ${
+            props.readOnly ? "bg-base-100 cursor-not-allowed opacity-90" : ""
           }`}
         >
           {children}
@@ -76,8 +79,11 @@ function FormField({
           {...props}
           type={type}
           placeholder={placeholder}
+          readOnly={props.readOnly}
           className={`input input-bordered w-full ${
             error ? "input-error" : ""
+          } ${
+            props.readOnly ? "bg-base-100 cursor-not-allowed opacity-90" : ""
           }`}
         />
       )}

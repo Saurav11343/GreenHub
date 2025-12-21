@@ -10,6 +10,7 @@ import {
   LogOut,
   FileChartColumn,
   Archive,
+  Heart,
 } from "lucide-react";
 import { useAuthStore } from "../../../store/useAuthStore";
 
@@ -100,6 +101,17 @@ function AdminSidebar() {
             >
               <Archive className="size-5" />
               <span className="is-drawer-close:hidden">Plant Stock</span>
+            </button>
+          </li>
+
+          <li>
+            <button
+              onClick={() => navigate("/admin/plantCare")}
+              className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+              data-tip="Plant Care"
+            >
+              <Heart className="size-5" />
+              <span className="is-drawer-close:hidden">Plant Care</span>
             </button>
           </li>
 

@@ -105,7 +105,7 @@ function OrderCardGrid({ orders, onRefresh }) {
               <div className="flex justify-between text-[11px] text-gray-600">
                 <span>
                   <strong>ID:</strong>{" "}
-                  <span className="truncate inline-block max-w-[90px] align-bottom">
+                  <span className=" inline-block max-w-[90px] align-bottom">
                     {order._id}
                   </span>
                 </span>
@@ -120,16 +120,11 @@ function OrderCardGrid({ orders, onRefresh }) {
 
               {/* ================= ITEMS ================= */}
               <ul className="list-disc ml-4 space-y-0.5 text-[11px]">
-                {order.items?.slice(0, 2).map((item) => (
+                {order.items?.map((item) => (
                   <li key={item._id} className="truncate">
                     {item.plantId?.name} × {item.quantity}
                   </li>
                 ))}
-                {order.items?.length > 2 && (
-                  <li className="italic text-gray-400">
-                    +{order.items.length - 2} more
-                  </li>
-                )}
               </ul>
 
               {/* ================= ACTIONS ================= */}

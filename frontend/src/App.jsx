@@ -20,6 +20,11 @@ import OrderDashboard from "./pages/admin/OrderDashboard";
 import CustomerOrder from "./pages/customer/CustomerOrder";
 import CustomerPayments from "./pages/customer/CustomerPayments";
 import PlantStockDashboard from "./pages/admin/PlantStockDashboard";
+import PlantCareDashboard from "./pages/admin/PlantCareDashboard";
+import PlantCareUpdateForm from "./components/page/plantCare/PlantCareUpdateForm";
+import CustomerPlantCare from "./pages/customer/CustomerPlantCare";
+import AboutUs from "./components/page/home/AboutUs";
+import ContactUs from "./components/page/home/ContactUs";
 //hello
 function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -45,6 +50,8 @@ function App() {
           {/* Public pages */}
           <Route path="/" element={<HomePage />} />
           <Route path="/plants" element={<PlantBrowse />} />
+          <Route path="/aboutUs" element={<AboutUs />} />
+          <Route path="/contactUs" element={<ContactUs />} />
 
           {/* Customer protected pages */}
           <Route element={<ProtectRoutes allowedRoles={["Customer"]} />}>
@@ -52,6 +59,11 @@ function App() {
             <Route path="/customer/orders/" element={<CustomerOrder />} />
             <Route path="/customer/payments/" element={<CustomerPayments />} />
             <Route path="/plants/details/:id" element={<PlantDetail />} />
+            <Route path="/customer/plantcare" element={<CustomerPlantCare />} />
+            <Route
+              path="/customer/plantcare/:plantId"
+              element={<PlantCareUpdateForm readOnly={true} />}
+            />
           </Route>
         </Route>
 
@@ -64,6 +76,11 @@ function App() {
             <Route path="/admin/orders" element={<OrderDashboard />} />
             <Route path="/admin/payments" element={<PaymentDashboard />} />
             <Route path="/admin/stock" element={<PlantStockDashboard />} />
+            <Route path="/admin/plantCare" element={<PlantCareDashboard />} />
+            <Route
+              path="/admin/plantCare/update/:plantId"
+              element={<PlantCareUpdateForm />}
+            />
           </Route>
         </Route>
       </Routes>
