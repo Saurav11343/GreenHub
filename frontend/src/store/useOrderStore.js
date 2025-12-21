@@ -150,6 +150,65 @@ export const useOrderStore = create((set) => ({
       set({ loading: false });
     }
   },
+
+  // =========================
+  // CUSTOMER: CANCEL ORDER
+  // =========================
+  cancelOrder: async (orderId) => {
+    try {
+      set({ loading: true, error: null, message: null });
+
+      const res = await axiosInstance.put(`/order/cancel/${orderId}`);
+
+      if (res.data?.success) {
+        set({ message: res.data.message });
+      } else {
+        set({ error: res.data.message || "Failed to cancel order" });
+      }
+
+      return res.data;
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.errors ||
+        "Failed to cancel order";
+
+      set({ error: message });
+      return { success: false, message };
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  // =========================
+  // ADMIN: UPDATE ORDER STATUS
+  // =========================
+  updateOrderStatus: async (orderId) => {
+    try {
+      set({ loading: true, error: null, message: null });
+
+      const res = await axiosInstance.put(`/order/status/${orderId}`);
+
+      if (res.data?.success) {
+        set({ message: res.data.message });
+      } else {
+        set({
+          error: res.data.message || "Failed to update order status",
+        });
+      }
+
+      return res.data;
+    } catch (err) {
+      const message =
+        err.response?.data?.message || "Failed to update order status";
+
+      set({ error: message });
+      return { success: false, message };
+    } finally {
+      set({ loading: false });
+    }
+  },
+
   // =========================
   // OPTIONAL: CLEAR STORE
   // =========================
