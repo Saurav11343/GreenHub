@@ -13,12 +13,10 @@ import { useCartStore } from "../../store/useCartStore";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/useAuthStore";
 
-/* Inline button loader */
 function ButtonLoader() {
   return <span className="loading loading-dots loading-sm" aria-hidden />;
 }
 
-/* Full page loader */
 function PageLoader() {
   return (
     <div className="flex items-center justify-center h-screen">
@@ -40,7 +38,6 @@ export default function PlantDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // plant store
   const {
     plant,
     loading: plantLoading,
@@ -48,7 +45,6 @@ export default function PlantDetail() {
     getPlantById,
   } = usePlantStore();
 
-  // cart store (use store loading/error)
   const {
     loading: cartLoading,
     error: cartError,
@@ -57,21 +53,17 @@ export default function PlantDetail() {
 
   const { userId } = useAuthStore();
 
-  // local UI state (quantity only) and local buy-loading
   const [qtySelected, setQtySelected] = React.useState(1);
   const [buyLoading, setBuyLoading] = React.useState(false);
 
-  // fetch plant
   React.useEffect(() => {
     if (id) getPlantById(id);
   }, [id, getPlantById]);
 
-  // reset qty when plant changes
   React.useEffect(() => {
     setQtySelected(1);
   }, [plant?._id]);
 
-  // show full-page loader while plant is loading
   if (plantLoading) return <PageLoader />;
 
   if (plantError)
@@ -106,7 +98,6 @@ export default function PlantDetail() {
   const categoryName =
     plant.categoryId?.name || plant.category || "Uncategorized";
 
-  // Add to cart: uses store createCartItem and store loading (cartLoading)
   const onAddToCart = async () => {
     const toastId = toast.loading("Adding to cart...");
     try {
@@ -120,7 +111,7 @@ export default function PlantDetail() {
 
       if (res?.success) {
         toast.success(res.message || "Added to cart");
-        setQtySelected(1); // reset quantity on success
+        setQtySelected(1);
       } else {
         toast.error(res?.message || "Failed to add to cart");
       }
@@ -130,7 +121,6 @@ export default function PlantDetail() {
     }
   };
 
-  // Buy now: uses local buyLoading (independent of store)
   const onBuyNow = async () => {
     setBuyLoading(true);
     const toastId = toast.loading("Processing purchase...");
@@ -279,14 +269,12 @@ export default function PlantDetail() {
               </div>
             </div>
 
-            {/* Show store-level cartError inline (optional) */}
             {cartError && (
               <div className="mt-3 px-3 py-2 rounded text-sm bg-red-50 text-red-700">
                 {cartError}
               </div>
             )}
 
-            {/* Action Buttons */}
             <div className="mt-4 flex gap-3">
               <button
                 onClick={onAddToCart}

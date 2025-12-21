@@ -35,7 +35,7 @@ function PlantCard({ plant, onEdit, onDelete }) {
 
       {/* Section 3 – Buttons */}
       <div className="w-full sm:w-auto flex gap-2 sm:flex-col sm:justify-center sm:items-end">
-        {/* On mobile: buttons are full-width. On sm+: compact column. */}
+        {/* On mobile */}
         <button
           className="btn btn-sm btn-primary flex-1 sm:flex-none flex items-center justify-center gap-2"
           onClick={() => onEdit?.(plant)}

@@ -61,7 +61,7 @@ export const createPlant = async (req, res) => {
       data: newPlant,
     });
   } catch (error) {
-    console.log("Error in createPlant controller:", error);
+    console.log("Error in createPlant plant.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -81,7 +81,7 @@ export const getAllPlants = async (req, res) => {
       data: plants,
     });
   } catch (error) {
-    console.log("Error in getAllPlants controller:", error);
+    console.log("Error in getAllPlants plant.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -113,7 +113,7 @@ export const getPlantById = async (req, res) => {
       data: plant,
     });
   } catch (error) {
-    console.log("Error in getPlantById controller:", error);
+    console.log("Error in getPlantById plant.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -173,21 +173,19 @@ export const updatePlant = async (req, res) => {
 
     if (updateData.imageUrl && updateData.imageUrl !== plant.imageUrl) {
       try {
-        // Extract public_id from old image URL
-        const urlParts = category.imageUrl.split("/");
-        const fileName = urlParts.pop(); // example: abcd123.png
-        const folder = urlParts.pop(); // example: categories
+        const urlParts = plant.imageUrl.split("/");
+        const fileName = urlParts.pop();
+        const folder = urlParts.pop();
 
-        const publicId = `${folder}/${fileName.split(".")[0]}`; // categories/abcd123
+        const publicId = `${folder}/${fileName.split(".")[0]}`;
 
-        // Delete old image
         const cloudRes = await cloudinary.uploader.destroy(publicId);
 
         if (cloudRes.result !== "ok" && cloudRes.result !== "not found") {
           console.log("Cloudinary deletion failed:", cloudRes);
         }
       } catch (err) {
-        console.log("❌ Error deleting old image from Cloudinary:", err);
+        console.log("Error deleting old image from Cloudinary:", err);
       }
     }
 
@@ -207,7 +205,7 @@ export const updatePlant = async (req, res) => {
       data: updatedPlant,
     });
   } catch (error) {
-    console.log("Error in updatePlant controller:", error);
+    console.log("Error in updatePlant plant.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -217,7 +215,6 @@ export const updatePlant = async (req, res) => {
 
 export const deletePlant = async (req, res) => {
   try {
-    // 1️⃣ Validate plant ID
     const validation = plantIdSchema.safeParse(req.params);
     if (!validation.success) {
       return res.status(400).json({
@@ -228,7 +225,6 @@ export const deletePlant = async (req, res) => {
 
     const { id } = validation.data;
 
-    // 2️⃣ Find plant first
     const plant = await Plant.findById(id);
     if (!plant) {
       return res.status(404).json({
@@ -237,30 +233,24 @@ export const deletePlant = async (req, res) => {
       });
     }
 
-    // 3️⃣ Extract Cloudinary publicId safely
     let publicId = null;
     if (plant.imageUrl) {
       try {
-        // Example URL:
-        // https://res.cloudinary.com/xyz/image/upload/v1723456789/plants/abc123.jpg
-
         const urlParts = plant.imageUrl.split("/");
-        const fileWithExt = urlParts.pop(); // abc123.jpg
-        const folderName = urlParts.pop(); // plants
-        const fileName = fileWithExt.split(".")[0]; // abc123
+        const fileWithExt = urlParts.pop();
+        const folderName = urlParts.pop();
+        const fileName = fileWithExt.split(".")[0];
 
-        publicId = `${folderName}/${fileName}`; // plants/abc123
+        publicId = `${folderName}/${fileName}`;
       } catch (err) {
-        console.log("❌ Cloudinary URL parsing failed", err);
+        console.log("Cloudinary URL parsing failed", err);
       }
     }
 
-    // 4️⃣ Delete Cloudinary image first
     if (publicId) {
       try {
         const cloudRes = await cloudinary.uploader.destroy(publicId);
 
-        // destroy returns: { result: "ok" } OR "not found"
         if (cloudRes.result !== "ok" && cloudRes.result !== "not found") {
           return res.status(500).json({
             success: false,
@@ -269,7 +259,7 @@ export const deletePlant = async (req, res) => {
           });
         }
       } catch (err) {
-        console.log("❌ Cloudinary deletion error:", err);
+        console.log("Cloudinary deletion error:", err);
         return res.status(500).json({
           success: false,
           message: "Cloudinary deletion failed",
@@ -277,7 +267,6 @@ export const deletePlant = async (req, res) => {
       }
     }
 
-    // 5️⃣ Now delete plant from DB
     await Plant.findByIdAndDelete(id);
 
     return res.status(200).json({
@@ -285,7 +274,7 @@ export const deletePlant = async (req, res) => {
       message: "Plant deleted successfully",
     });
   } catch (error) {
-    console.log("Error in deletePlant controller:", error);
+    console.log("Error in deletePlant plant.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -316,7 +305,7 @@ export const getPlantByCategory = async (req, res) => {
       data: plants,
     });
   } catch (error) {
-    console.log("Error in getPlantByCategory controller:", error);
+    console.log("Error in getPlantByCategory plant.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -353,7 +342,6 @@ export const updateCareInstructions = async (req, res) => {
       });
     }
 
-    // 🔴 STEP 1: Fetch plant
     const plant = await Plant.findById(plantId);
     if (!plant) {
       return res.status(404).json({
@@ -362,7 +350,6 @@ export const updateCareInstructions = async (req, res) => {
       });
     }
 
-    // 🔴 STEP 2: Normalize old data (string → object)
     if (
       typeof plant.careInstructions !== "object" ||
       plant.careInstructions === null
@@ -371,7 +358,6 @@ export const updateCareInstructions = async (req, res) => {
       await plant.save();
     }
 
-    // 🔴 STEP 3: Apply update
     const updatedPlant = await Plant.findByIdAndUpdate(
       plantId,
       { $set: setObj },
@@ -384,7 +370,7 @@ export const updateCareInstructions = async (req, res) => {
       data: updatedPlant.careInstructions,
     });
   } catch (error) {
-    console.error("Update care instructions error:", error);
+    console.error("Error in updateCareInstructions plant.controller: ", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -409,7 +395,7 @@ export const getAllPlantCareTips = async (req, res) => {
       data: plants,
     });
   } catch (error) {
-    console.error("Get all plant care tips error:", error);
+    console.error("Error in getAllPlantCareTips plant.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -439,7 +425,7 @@ export const getPlantCareTipById = async (req, res) => {
       data: plant,
     });
   } catch (error) {
-    console.error("Get plant care tip error:", error);
+    console.error("Error in getPlantCareTipById plant.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",

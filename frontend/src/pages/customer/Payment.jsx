@@ -6,9 +6,6 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { usePaymentStore } from "../../store/usePaymentStore";
 import { useOrderStore } from "../../store/useOrderStore";
 
-/* --------------------------------
-   RAZORPAY SCRIPT LOADER
---------------------------------- */
 const loadRazorpay = () => {
   return new Promise((resolve, reject) => {
     if (window.Razorpay) return resolve(true);
@@ -36,16 +33,10 @@ function Payment({ orderId, onClose }) {
     usePaymentStore();
   const { getOrderById, order } = useOrderStore();
 
-  /* -----------------------------
-     FETCH ORDER
-  ------------------------------ */
   useEffect(() => {
     if (orderId) getOrderById(orderId);
   }, [orderId, getOrderById]);
 
-  /* -----------------------------
-     OPEN RAZORPAY (SAFE)
-  ------------------------------ */
   useEffect(() => {
     if (!order || hasOpenedRef.current) return;
 
@@ -53,10 +44,8 @@ function Payment({ orderId, onClose }) {
       try {
         hasOpenedRef.current = true;
 
-        // 1️⃣ Load Razorpay SDK
         await loadRazorpay();
 
-        // 2️⃣ Create Razorpay order
         const rpRes = await createRazorpayOrder(order.totalAmount);
         if (!rpRes?.success) {
           throw new Error("Failed to create Razorpay order");
@@ -90,7 +79,6 @@ function Payment({ orderId, onClose }) {
 
           modal: {
             ondismiss: async () => {
-              // 🚫 Do nothing if payment already succeeded
               if (paymentCompletedRef.current) return;
 
               await markPaymentFailed({
@@ -106,7 +94,6 @@ function Payment({ orderId, onClose }) {
 
         const rzp = new window.Razorpay(options);
 
-        // ✅ Hide loader only when checkout is opening
         setLoading(false);
         rzp.open();
       } catch (err) {
@@ -127,9 +114,6 @@ function Payment({ orderId, onClose }) {
     onClose,
   ]);
 
-  /* -----------------------------
-     UI
-  ------------------------------ */
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-10 gap-2">

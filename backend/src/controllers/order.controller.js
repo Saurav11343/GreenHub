@@ -12,9 +12,6 @@ import {
 
 export const createOrder = async (req, res) => {
   try {
-    /**
-     * 1️⃣ Validate request body
-     */
     const validation = createOrderSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({
@@ -25,9 +22,6 @@ export const createOrder = async (req, res) => {
 
     const { userId, shippingAddress } = validation.data;
 
-    /**
-     * 2️⃣ Validate user
-     */
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -36,9 +30,6 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    /**
-     * 3️⃣ Fetch cart items (SOURCE OF TRUTH)
-     */
     const cartItems = await CartItem.find({ userId }).populate(
       "plantId",
       "price name stockQty"
@@ -51,9 +42,6 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    /**
-     * 4️⃣ Calculate total (SERVER SIDE)
-     */
     let calculatedTotal = 0;
 
     const orderDetails = cartItems.map((item) => {
@@ -69,9 +57,6 @@ export const createOrder = async (req, res) => {
       };
     });
 
-    /**
-     * 5️⃣ Create order (PENDING)
-     */
     const newOrder = await Order.create({
       userId,
       totalAmount: calculatedTotal,
@@ -79,9 +64,6 @@ export const createOrder = async (req, res) => {
       status: "PaymentPending",
     });
 
-    /**
-     * 6️⃣ Create order details
-     */
     const orderDetailsWithOrderId = orderDetails.map((detail) => ({
       ...detail,
       orderId: newOrder._id,
@@ -89,14 +71,6 @@ export const createOrder = async (req, res) => {
 
     await OrderDetail.insertMany(orderDetailsWithOrderId);
 
-    /**
-     * ❌ DO NOT CLEAR CART HERE
-     * Cart will be cleared only after PAYMENT SUCCESS
-     */
-
-    /**
-     * 7️⃣ Success response
-     */
     return res.status(201).json({
       success: true,
       message: "Order created. Proceed to payment.",
@@ -106,7 +80,7 @@ export const createOrder = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error in createOrder controller:", error);
+    console.error("Error in createOrder order.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -164,7 +138,7 @@ export const getUserOrders = async (req, res) => {
       orders: ordersWithDetails,
     });
   } catch (error) {
-    console.log("Error in getUserOrders controller:", error);
+    console.log("Error in getUserOrders order.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -207,7 +181,7 @@ export const getOrderById = async (req, res) => {
       order: orderWithItems,
     });
   } catch (error) {
-    console.log("Error in getOrderById controller:", error);
+    console.log("Error in getOrderById order.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -235,7 +209,6 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
 
-    // ❌ Block final states
     if (["Delivered", "Cancelled", "PaymentFailed"].includes(order.status)) {
       return res.status(400).json({
         success: false,
@@ -243,12 +216,9 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
 
-    // ✅ Confirmed → Shipped
     if (order.status === "Confirmed") {
       order.status = "Shipped";
-    }
-    // ✅ Shipped → Delivered
-    else if (order.status === "Shipped") {
+    } else if (order.status === "Shipped") {
       order.status = "Delivered";
     } else {
       return res.status(400).json({
@@ -266,7 +236,7 @@ export const updateOrderStatus = async (req, res) => {
       order: updatedOrder,
     });
   } catch (error) {
-    console.error("Error in updateOrderStatus:", error);
+    console.error("Error in updateOrderStatus order.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -294,7 +264,6 @@ export const cancelOrder = async (req, res) => {
       });
     }
 
-    // ❌ Disallow cancellation in final states
     if (
       ["Shipped", "Delivered", "Cancelled", "PaymentFailed"].includes(
         order.status
@@ -306,7 +275,6 @@ export const cancelOrder = async (req, res) => {
       });
     }
 
-    // ✅ Allowed: PaymentPending / Confirmed
     order.status = "Cancelled";
     order.statusUpdatedAt = new Date();
 
@@ -318,7 +286,7 @@ export const cancelOrder = async (req, res) => {
       order: cancelledOrder,
     });
   } catch (error) {
-    console.error("Error in cancelOrder controller:", error);
+    console.error("Error in cancelOrder order.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -361,7 +329,7 @@ export const getAllOrders = async (req, res) => {
       orders: ordersWithDetails,
     });
   } catch (error) {
-    console.log("Error in getAllOrders controller:", error);
+    console.log("Error in getAllOrders order.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",

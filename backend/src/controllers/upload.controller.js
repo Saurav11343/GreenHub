@@ -13,15 +13,13 @@ export const uploadImage = async (req, res) => {
       });
     }
 
-    // 1️⃣ Resize + compress using Sharp
     const resizedImageBuffer = await sharp(file.buffer)
       .resize(800, 800, {
-        fit: "cover", // crop to fill — BEST for profile/category images
+        fit: "cover",
       })
-      .jpeg({ quality: 85 }) // compress but keep good quality
+      .jpeg({ quality: 85 })
       .toBuffer();
 
-    // 2️⃣ Upload resized buffer to Cloudinary
     const result = await new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream({ folder: folderName }, (error, result) => {
@@ -36,7 +34,7 @@ export const uploadImage = async (req, res) => {
       imageUrl: result.secure_url,
     });
   } catch (err) {
-    console.log("❌ Cloudinary Upload Error:", err);
+    console.log("Error in uploadImage upload.controller:", err);
     return res.status(500).json({
       success: false,
       message: "Upload failed due to server error",

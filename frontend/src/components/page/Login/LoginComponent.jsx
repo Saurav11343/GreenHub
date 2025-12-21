@@ -36,7 +36,7 @@ function LoginComponent() {
 
         if (role === "Admin") navigate("/admin");
         else if (role === "Customer") navigate("/plants");
-        else navigate("/"); // fallback
+        else navigate("/"); 
       }
     } catch (err) {
       console.error(err);

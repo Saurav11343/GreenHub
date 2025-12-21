@@ -7,7 +7,7 @@ import PageLoader from "../../components/loader/PageLoader";
 
 function CustomerOrder() {
   const { authUser } = useAuthStore();
-  const userId = authUser?.userId; // ✅ CORRECT KEY
+  const userId = authUser?.userId;
 
   const {
     orders = [],
@@ -22,26 +22,20 @@ function CustomerOrder() {
     dateRange: "",
   });
 
-  /* -----------------------------
-        FETCH CUSTOMER ORDERS
-  ------------------------------ */
   useEffect(() => {
     if (!userId) return;
 
-    clearOrders(); // clear previous user data
-    getUserOrders(userId); // fetch correct user orders
+    clearOrders();
+    getUserOrders(userId);
 
     return () => {
-      clearOrders(); // cleanup on unmount
+      clearOrders();
     };
   }, [userId, getUserOrders, clearOrders]);
 
   if (loading) return <PageLoader />;
   if (error) return <p className="text-red-500">{error}</p>;
 
-  /* -----------------------------
-        FILTER LOGIC
-  ------------------------------ */
   const filteredOrders = orders.filter((order) => {
     if (filters.status && order.status !== filters.status) return false;
 

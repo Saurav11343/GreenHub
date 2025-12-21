@@ -15,7 +15,7 @@ function HeroSection() {
         backgroundPosition: "center",
       }}
     >
-      {/* Overlay for readability */}
+
       <div className="absolute inset-0 bg-black/50"></div>
       <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/30 to-transparent"></div>
 

@@ -10,7 +10,7 @@ import DefaultNavbar from "../navbar/DefaultNavbar";
 function RootLayout() {
   const { authUser, isCheckingAuth } = useAuthStore();
 
-  // 🔥 Prevent wrong navbar during auth flicker
+
   if (isCheckingAuth) return null;
 
   const role = authUser?.roleName?.toLowerCase();

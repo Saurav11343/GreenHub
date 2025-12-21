@@ -9,15 +9,6 @@ import { useImageCompression } from "../../../utils/useImageCompression.js";
 import ButtonLoader from "../../common/ButtonLoader.jsx";
 import ImageUpload from "../../common/UploadImage.jsx";
 
-/**
- * Props:
- * - isOpen: boolean
- * - onClose: () => void
- * - onSubmit: async (data) => void
- * - initialData: optional plant object for edit mode
- * - type: "add" | "edit"
- * - categories: optional array of { _id, name } or strings
- */
 function PlantFormModal({
   isOpen,
   onClose,
@@ -40,7 +31,7 @@ function PlantFormModal({
     mode: "onChange",
     defaultValues: {
       name: "",
-      categoryId: "", // <-- align with schema
+      categoryId: "",
       price: undefined,
       stockQty: undefined,
       description: "",
@@ -52,12 +43,10 @@ function PlantFormModal({
   const [previewImg, setPreviewImg] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  // Normalize categories to { id, name } using a memo so it's stable
   const normalizedCategories = useMemo(
     () =>
       (categories || []).map((c) => {
         if (!c) return { id: "", name: "" };
-        // category shape from API seems to be { _id, name }
         if (typeof c === "string") return { id: c, name: c };
         return {
           id: c._id ?? c.id ?? String(c.name ?? ""),
@@ -67,20 +56,13 @@ function PlantFormModal({
     [categories]
   );
 
-  // Resolve initial categoryId from initialData:
-  // - if initialData.categoryId is an object with _id, use that
-  // - if it's a string/ID, use it
-  // - else if initialData has category (name), try to find matching id by name
   const resolveInitialCategoryId = (initial) => {
     if (!initial) return "";
     const cat = initial.categoryId;
     if (cat) {
-      // object like { _id, name }
       if (typeof cat === "object") return cat._id ?? cat.id ?? "";
-      // string id
       if (typeof cat === "string") return cat;
     }
-    // fallback: initial.category may be name string — try find matching normalized category
     const name = initial.category ?? initial.categoryName ?? "";
     if (name) {
       const found = normalizedCategories.find(
@@ -91,7 +73,6 @@ function PlantFormModal({
     return "";
   };
 
-  // Load initial data (edit mode)
   useEffect(() => {
     if (initialData) {
       reset({
@@ -117,15 +98,10 @@ function PlantFormModal({
       reset();
       setPreviewImg(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    initialData,
-    reset /* normalizedCategories not added to avoid frequent resets */,
-  ]);
+  }, [initialData, reset]);
 
   if (!isOpen) return null;
 
-  // Final submit: compress & upload image if selected, then call onSubmit
   const handleFinalSubmit = async (formData) => {
     setSaving(true);
 
@@ -137,7 +113,6 @@ function PlantFormModal({
         setValue("imageUrl", url);
       }
 
-      // Safety fallback: ensure numbers before sending to backend
       formData.price =
         typeof formData.price === "number"
           ? formData.price
@@ -152,8 +127,6 @@ function PlantFormModal({
           ? 0
           : Number(formData.stockQty);
 
-      // IMPORTANT: Ensure we send categoryId (string id) to backend
-      // If the form somehow has an object, convert it:
       if (
         typeof formData.categoryId === "object" &&
         formData.categoryId !== null
@@ -259,9 +232,6 @@ function PlantFormModal({
             error={errors.description}
           />
 
-
-
-          {/* Hidden imageUrl field rendered via FormField */}
           <FormField
             as="input"
             type="hidden"

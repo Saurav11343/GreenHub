@@ -24,7 +24,6 @@ const ORDER_COLORS = {
 function AdminCharts({ summary }) {
   if (!summary) return null;
 
-  /* ---------------- ORDER STATUS ---------------- */
   const orderData = [
     {
       name: "Payment Pending",
@@ -57,13 +56,12 @@ function AdminCharts({ summary }) {
       key: "PaymentFailed",
     },
   ].filter((item) => item.value > 0);
-  /* ---------------- PAYMENTS ---------------- */
+
   const paymentData = [
     { name: "Success", value: summary.payments.success },
     { name: "Failed", value: summary.payments.failed },
   ];
 
-  /* ---------------- TOP PLANTS ---------------- */
   const topPlantsData = summary.topPlants.map((p) => ({
     name: p.name,
     sold: p.totalSold,
@@ -71,7 +69,6 @@ function AdminCharts({ summary }) {
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      {/* ================= ORDER STATUS PIE ================= */}
       <div className="card bg-base-100 shadow-md">
         <div className="card-body">
           <h2 className="font-semibold mb-3">Order Status</h2>
@@ -101,7 +98,6 @@ function AdminCharts({ summary }) {
         </div>
       </div>
 
-      {/* ================= PAYMENTS BAR ================= */}
       <div className="card bg-base-100 shadow-md">
         <div className="card-body">
           <h2 className="font-semibold mb-3">Payments</h2>
@@ -117,7 +113,6 @@ function AdminCharts({ summary }) {
         </div>
       </div>
 
-      {/* ================= TOP PLANTS ================= */}
       <div className="card bg-base-100 shadow-md">
         <div className="card-body">
           <h2 className="font-semibold mb-3">Top Selling Plants</h2>

@@ -26,9 +26,6 @@ function OrderDashboard() {
   if (loading) return <PageLoader />;
   if (error) return <p className="text-red-500">{error}</p>;
 
-  /* -----------------------------
-        FILTER LOGIC
-  ------------------------------ */
   const filteredOrders = orders.filter((order) => {
     if (filters.status && order.status !== filters.status) return false;
 

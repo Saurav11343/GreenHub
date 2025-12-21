@@ -22,7 +22,6 @@ export default function PlantCareBrowse({
   const [filteredPlants, setFilteredPlants] = useState(null);
   const navigate = useNavigate();
 
-  // initial fetch
   const didFetchRef = useRef(false);
   useEffect(() => {
     if (didFetchRef.current) return;
@@ -31,12 +30,10 @@ export default function PlantCareBrowse({
     getAllPlants();
   }, [getAllCategories, getAllPlants]);
 
-  // reset filter snapshot when plant list changes
   useEffect(() => {
     setFilteredPlants(null);
   }, [plants]);
 
-  // client-side filter (search + category only)
   const runClientFilter = useCallback(
     (filters) => {
       const q = (filters.q || "").trim().toLowerCase();
@@ -65,7 +62,6 @@ export default function PlantCareBrowse({
     [runClientFilter]
   );
 
-  // derive category name from route state
   const selectedCategoryName = useMemo(() => {
     if (!categoryIdFromState || categories.length === 0) return "";
     return (
@@ -75,7 +71,6 @@ export default function PlantCareBrowse({
     );
   }, [categoryIdFromState, categories]);
 
-  // auto-apply category filter
   useEffect(() => {
     if (!selectedCategoryName) return;
     runClientFilter({ q: "", category: selectedCategoryName });
@@ -96,7 +91,7 @@ export default function PlantCareBrowse({
         categories={categories}
         onFilter={handleFilter}
         defaultValues={filterDefaultValues}
-        hidePriceFilter // 🔹 optional prop if you want to hide price UI
+        hidePriceFilter
       />
 
       {/* Grid */}

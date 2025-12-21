@@ -14,14 +14,8 @@ import Payment from "./Payment";
 function CheckOut() {
   const navigate = useNavigate();
 
-  /* -----------------------------
-     AUTH
-  ------------------------------ */
   const { userId } = useAuthStore();
 
-  /* -----------------------------
-     CART STORE
-  ------------------------------ */
   const {
     cartItems = [],
     getUserCartItem,
@@ -32,9 +26,6 @@ function CheckOut() {
 
   const { loading, createOrder } = useOrderStore();
 
-  /* -----------------------------
-     FORM
-  ------------------------------ */
   const {
     register,
     handleSubmit,
@@ -51,9 +42,6 @@ function CheckOut() {
     },
   });
 
-  /* -----------------------------
-     LOCAL STATE
-  ------------------------------ */
   const [quantities, setQuantities] = useState({});
   const [updatingItemId, setUpdatingItemId] = useState(null);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -61,9 +49,6 @@ function CheckOut() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState(null);
 
-  /* -----------------------------
-     INITIAL FETCH
-  ------------------------------ */
   useEffect(() => {
     const fetchCart = async () => {
       if (userId) {
@@ -74,9 +59,6 @@ function CheckOut() {
     fetchCart();
   }, [userId, getUserCartItem]);
 
-  /* -----------------------------
-     SYNC QUANTITIES
-  ------------------------------ */
   useEffect(() => {
     const map = {};
     cartItems.forEach((it) => {
@@ -85,9 +67,6 @@ function CheckOut() {
     setQuantities(map);
   }, [cartItems]);
 
-  /* -----------------------------
-     HELPERS
-  ------------------------------ */
   const getStockForItem = (item) => Number(item?.plantId?.stockQty ?? 0);
 
   const lineTotal = (item) =>
@@ -100,9 +79,6 @@ function CheckOut() {
     setValue("totalAmount", subtotal);
   }, [subtotal, userId, setValue]);
 
-  /* -----------------------------
-     STOCK-SAFE QUANTITY UPDATE
-  ------------------------------ */
   const updateQtyByDelta = async (itemId, delta) => {
     const item = cartItems.find((i) => i._id === itemId);
     if (!item) return;
@@ -134,9 +110,6 @@ function CheckOut() {
     }
   };
 
-  /* -----------------------------
-     CART ACTIONS
-  ------------------------------ */
   const handleRemove = async (id) => {
     const res = await deleteCartItem(userId, id);
     res.success
@@ -158,16 +131,10 @@ function CheckOut() {
       maximumFractionDigits: 0,
     }).format(value);
 
-  /* -----------------------------
-     STOCK VALIDATION BEFORE PAY
-  ------------------------------ */
   const hasStockIssue = cartItems.some(
     (item) => quantities[item._id] > getStockForItem(item)
   );
 
-  /* -----------------------------
-     SUBMIT ORDER
-  ------------------------------ */
   const onSubmit = async (data) => {
     if (hasStockIssue) {
       toast.error("Some items exceed available stock");
@@ -193,19 +160,16 @@ function CheckOut() {
     setShowPaymentModal(false);
     setCreatedOrderId(null);
 
-    // ✅ Refetch cart
     if (userId) {
       await getUserCartItem(userId);
     }
 
-    // ✅ RESET FORM FIELDS
     reset({
       userId,
       totalAmount: 0,
       shippingAddress: "",
     });
 
-    // ✅ RESET LOCAL QUANTITIES
     setQuantities({});
   };
 
@@ -215,9 +179,6 @@ function CheckOut() {
     return <span className="loading loading-spinner loading-xs" />;
   }
 
-  /* =============================
-     RENDER
-  ============================== */
   return (
     <div className="container mx-auto px-4 py-6">
       {/* HEADER */}

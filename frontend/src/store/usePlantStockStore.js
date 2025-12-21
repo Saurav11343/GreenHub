@@ -2,14 +2,12 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 
 export const usePlantStockStore = create((set) => ({
-  /* -------------------- STATE -------------------- */
   plantStocks: [],
   stockSummary: null,
   loading: false,
   error: null,
   message: null,
 
-  /* -------------------- GET STOCK SUMMARY (READ) -------------------- */
   getStockSummary: async () => {
     try {
       set({ loading: true, error: null });
@@ -30,7 +28,6 @@ export const usePlantStockStore = create((set) => ({
     }
   },
 
-  /* -------------------- GET ALL PLANT STOCK (READ) -------------------- */
   getAllPlantStock: async () => {
     try {
       set({ loading: true, error: null });
@@ -51,7 +48,6 @@ export const usePlantStockStore = create((set) => ({
     }
   },
 
-  /* -------------------- GET LOW STOCK PLANTS (READ) -------------------- */
   getLowStockPlants: async (threshold = 5) => {
     try {
       set({ loading: true, error: null });
@@ -74,7 +70,6 @@ export const usePlantStockStore = create((set) => ({
     }
   },
 
-  /* -------------------- UPDATE PLANT STOCK (DML) -------------------- */
   updatePlantStock: async (plantId, stockQty) => {
     try {
       set({ loading: true, error: null, message: null });
@@ -106,7 +101,6 @@ export const usePlantStockStore = create((set) => ({
     }
   },
 
-  /* -------------------- CLEAR STATE -------------------- */
   clearStockState: () => {
     set({
       plantStocks: [],

@@ -9,7 +9,6 @@ export const getAdminDashboardSummary = async (req, res) => {
   try {
     const { fromDate, toDate } = req.query;
 
-    /* ---------------- DATE FILTER ---------------- */
     const dateFilter = {};
     if (fromDate || toDate) {
       dateFilter.createdAt = {};
@@ -17,60 +16,40 @@ export const getAdminDashboardSummary = async (req, res) => {
       if (toDate) dateFilter.createdAt.$lte = new Date(toDate);
     }
 
-    /* ---------------- ORDERS ---------------- */
     const totalOrders = await Order.countDocuments(dateFilter);
-
-    const paymentPendingOrders = await Order.countDocuments({
+    const pendingOrders = await Order.countDocuments({
       ...dateFilter,
-      status: "PaymentPending",
+      status: "Pending",
     });
-
-    const confirmedOrders = await Order.countDocuments({
+    const paidOrders = await Order.countDocuments({
       ...dateFilter,
-      status: "Confirmed",
+      status: "Paid",
     });
-
-    const shippedOrders = await Order.countDocuments({
-      ...dateFilter,
-      status: "Shipped",
-    });
-
     const deliveredOrders = await Order.countDocuments({
       ...dateFilter,
       status: "Delivered",
     });
-
     const cancelledOrders = await Order.countDocuments({
       ...dateFilter,
       status: "Cancelled",
     });
-
-    const paymentFailedOrders = await Order.countDocuments({
+    const failedOrders = await Order.countDocuments({
       ...dateFilter,
-      status: "PaymentFailed",
+      status: "Failed",
     });
 
-    /* ---------------- PAYMENTS ---------------- */
     const totalPayments = await Payment.countDocuments(dateFilter);
-
     const successfulPayments = await Payment.countDocuments({
       ...dateFilter,
       status: "Success",
     });
-
     const failedPayments = await Payment.countDocuments({
       ...dateFilter,
       status: "Failed",
     });
 
-    /* ---------------- REVENUE ---------------- */
     const revenueAgg = await Payment.aggregate([
-      {
-        $match: {
-          status: "Success",
-          ...(dateFilter.createdAt && { createdAt: dateFilter.createdAt }),
-        },
-      },
+      { $match: { status: "Success", ...dateFilter } },
       {
         $group: {
           _id: null,
@@ -81,20 +60,16 @@ export const getAdminDashboardSummary = async (req, res) => {
 
     const totalRevenue = revenueAgg[0]?.totalRevenue || 0;
 
-    /* ---------------- USERS ---------------- */
     const totalUsers = await User.countDocuments();
     const newUsers = await User.countDocuments(dateFilter);
 
-    /* ---------------- PLANTS ---------------- */
     const totalPlants = await Plant.countDocuments();
     const outOfStockPlants = await Plant.countDocuments({
-      stockQty: { $lte: 0 },
+      stock: { $lte: 0 },
     });
 
-    /* ---------------- CATEGORIES ---------------- */
     const totalCategories = await Category.countDocuments();
 
-    /* ---------------- TOP SELLING PLANTS ---------------- */
     const topPlants = await OrderDetail.aggregate([
       {
         $group: {
@@ -123,18 +98,16 @@ export const getAdminDashboardSummary = async (req, res) => {
       },
     ]);
 
-    /* ---------------- RESPONSE ---------------- */
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       summary: {
         orders: {
           total: totalOrders,
-          paymentPending: paymentPendingOrders,
-          confirmed: confirmedOrders,
-          shipped: shippedOrders,
+          pending: pendingOrders,
           delivered: deliveredOrders,
+          paid: paidOrders,
           cancelled: cancelledOrders,
-          paymentFailed: paymentFailedOrders,
+          failed: failedOrders,
         },
         payments: {
           total: totalPayments,
@@ -159,8 +132,11 @@ export const getAdminDashboardSummary = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Admin dashboard summary error:", error);
-    return res.status(500).json({
+    console.error(
+      "error in get AdminDashboardSummary analysis.controller:",
+      error
+    );
+    res.status(500).json({
       success: false,
       message: "Failed to load dashboard summary",
     });

@@ -36,9 +36,6 @@ function ManageCategories() {
     "description",
   ]);
 
-  /* -----------------------------
-        OPEN MODALS
-  ------------------------------ */
   const openAddModal = () => {
     setFormType("add");
     setSelectedCategory(null);
@@ -56,9 +53,6 @@ function ManageCategories() {
     setIsDeleteOpen(true);
   };
 
-  /* -----------------------------
-        ACTION HANDLERS
-  ------------------------------ */
   const handleFormSubmit = async (data) => {
     let res;
 

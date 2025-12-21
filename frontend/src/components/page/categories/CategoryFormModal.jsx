@@ -32,7 +32,7 @@ function CategoryFormModal({ isOpen, onClose, onSubmit, initialData, type }) {
   const [previewImg, setPreviewImg] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  // Load initial data (edit mode)
+
   useEffect(() => {
     if (initialData) {
       reset({
@@ -49,7 +49,7 @@ function CategoryFormModal({ isOpen, onClose, onSubmit, initialData, type }) {
 
   if (!isOpen) return null;
 
-  // ⭐ One-click submit: upload image + save category
+
   const handleFinalSubmit = async (formData) => {
     setSaving(true);
 

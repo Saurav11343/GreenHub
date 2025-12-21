@@ -26,14 +26,10 @@ const mapRazorpayMethod = (method) => {
   }
 };
 
-/**
- * CREATE RAZORPAY ORDER
- */
 export const createRazorpayOrder = async (req, res) => {
   try {
     const { amount } = req.body;
 
-    // ✅ SAFETY CHECK
     if (!amount || amount <= 0) {
       return res.status(400).json({
         success: false,
@@ -42,7 +38,7 @@ export const createRazorpayOrder = async (req, res) => {
     }
 
     const order = await razorpay.orders.create({
-      amount: amount * 100, // ₹ → paise
+      amount: amount * 100,
       currency: "INR",
       receipt: "rcpt_" + Date.now(),
     });
@@ -52,7 +48,7 @@ export const createRazorpayOrder = async (req, res) => {
       order,
     });
   } catch (error) {
-    console.error("Razorpay Error:", error);
+    console.error("error in createRazorpayOrder payment.controller:", error);
 
     res.status(500).json({
       success: false,
@@ -61,47 +57,6 @@ export const createRazorpayOrder = async (req, res) => {
   }
 };
 
-/**
- * SAVE PAYMENT AFTER SUCCESS
- */
-// export const saveOnlinePayment = async (req, res) => {
-//   try {
-//     const { orderId, userId, amount, status, transactionId } = req.body;
-
-//     const paymentDetails = await razorpay.payments.fetch(transactionId);
-
-//     // 2️⃣ Save payment record
-//     const payment = await Payment.create({
-//       orderId,
-//       userId,
-//       amount,
-//       method:
-//         paymentDetails.method === "upi"
-//           ? "UPI"
-//           : paymentDetails.method === "card"
-//           ? "Card"
-//           : "COD",
-//       status,
-//       transactionId,
-//     });
-
-//     await Order.findByIdAndUpdate(orderId, { status: "Paid" }, { new: true });
-
-//     res.json({
-//       success: true,
-//       message: "Payment successful.",
-//       payment,
-//     });
-//   } catch (error) {
-//     console.error("Save payment error:", error);
-
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to save payment",
-//     });
-//   }
-// };
-
 export const verifyAndCompletePayment = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -109,9 +64,6 @@ export const verifyAndCompletePayment = async (req, res) => {
   try {
     const { orderId, userId, transactionId } = req.body;
 
-    /* -----------------------------
-       1️⃣ FETCH ORDER
-    ------------------------------ */
     const order = await Order.findById(orderId).session(session);
     if (!order) throw new Error("Order not found");
 
@@ -119,27 +71,17 @@ export const verifyAndCompletePayment = async (req, res) => {
       throw new Error("Order is not awaiting payment");
     }
 
-    /* -----------------------------
-       2️⃣ VERIFY PAYMENT WITH RAZORPAY
-    ------------------------------ */
     const paymentDetails = await razorpay.payments.fetch(transactionId);
 
     if (paymentDetails.status !== "captured") {
       throw new Error("Payment not successful");
     }
 
-    /* -----------------------------
-       3️⃣ FETCH ORDER ITEMS
-    ------------------------------ */
     const orderItems = await OrderDetail.find({ orderId }).session(session);
     if (!orderItems.length) {
       throw new Error("Order items not found");
     }
 
-    /* -----------------------------
-       4️⃣ UPDATE PLANT STOCK
-       (PREVENT OVERSELLING)
-    ------------------------------ */
     for (const item of orderItems) {
       const result = await Plant.updateOne(
         {
@@ -157,9 +99,6 @@ export const verifyAndCompletePayment = async (req, res) => {
       }
     }
 
-    /* -----------------------------
-       5️⃣ SAVE PAYMENT RECORD
-    ------------------------------ */
     const payment = await Payment.create(
       [
         {
@@ -174,9 +113,6 @@ export const verifyAndCompletePayment = async (req, res) => {
       { session }
     );
 
-    /* -----------------------------
-       6️⃣ UPDATE ORDER STATUS
-    ------------------------------ */
     await Order.updateOne(
       { _id: orderId },
       {
@@ -186,14 +122,8 @@ export const verifyAndCompletePayment = async (req, res) => {
       { session }
     );
 
-    /* -----------------------------
-       7️⃣ CLEAR CART (ONLY AFTER SUCCESS)
-    ------------------------------ */
     await CartItem.deleteMany({ userId }).session(session);
 
-    /* -----------------------------
-       8️⃣ COMMIT TRANSACTION
-    ------------------------------ */
     await session.commitTransaction();
     session.endSession();
 
@@ -206,7 +136,10 @@ export const verifyAndCompletePayment = async (req, res) => {
     await session.abortTransaction();
     session.endSession();
 
-    console.error("verifyAndCompletePayment error:", error);
+    console.error(
+      "error in verifyAndCompletePayment payment.controller:",
+      error
+    );
 
     return res.status(400).json({
       success: false,
@@ -227,7 +160,6 @@ export const markPaymentFailed = async (req, res) => {
       });
     }
 
-    // 🚫 NEVER mark a paid order as failed
     if (order.status !== "PaymentPending") {
       return res.status(400).json({
         success: false,
@@ -235,7 +167,6 @@ export const markPaymentFailed = async (req, res) => {
       });
     }
 
-    // Prevent duplicate failed payments
     const existing = await Payment.findOne({
       orderId,
       status: "Failed",
@@ -264,7 +195,7 @@ export const markPaymentFailed = async (req, res) => {
       message: "Payment failed. You can retry payment.",
     });
   } catch (err) {
-    console.error("markPaymentFailed error:", err);
+    console.error("error in markPaymentFailed payment.controller:", err);
     return res.status(500).json({
       success: false,
       message: "Failed to mark payment",
@@ -279,29 +210,23 @@ export const getAllPayments = async (req, res) => {
 
     const filter = {};
 
-    // Status filter
     if (status) filter.status = status;
 
-    // Method filter
     if (method) filter.method = method;
 
-    // User filter
     if (userId) filter.userId = userId;
 
-    // Amount filter
     if (minAmount || maxAmount) {
       filter.amount = {};
       if (!isNaN(minAmount)) filter.amount.$gte = Number(minAmount);
       if (!isNaN(maxAmount)) filter.amount.$lte = Number(maxAmount);
     }
 
-    // ✅ DATE RANGE FILTER (SERVER SIDE)
     if (dateRange) {
       const now = new Date();
       let fromDate;
       let toDate = new Date();
 
-      // End of today
       toDate.setHours(23, 59, 59, 999);
 
       if (dateRange === "today") {
@@ -327,7 +252,6 @@ export const getAllPayments = async (req, res) => {
       };
     }
 
-    // Sorting
     const sortQuery = sort === "oldest" ? { createdAt: 1 } : { createdAt: -1 };
 
     const payments = await Payment.find(filter)
@@ -340,7 +264,7 @@ export const getAllPayments = async (req, res) => {
       payments,
     });
   } catch (error) {
-    console.error("Get payments error:", error);
+    console.error("error in getAllPayments payment.controller:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch payments",
@@ -354,27 +278,18 @@ export const getUserPayments = async (req, res) => {
 
     const { status, method, minAmount, maxAmount, dateRange, sort } = req.query;
 
-    /* -----------------------------
-        BASE FILTER (USER ONLY)
-    ------------------------------ */
     const filter = { userId };
 
-    // Status filter
     if (status) filter.status = status;
 
-    // Method filter
     if (method) filter.method = method;
 
-    // Amount filter
     if (minAmount || maxAmount) {
       filter.amount = {};
       if (!isNaN(minAmount)) filter.amount.$gte = Number(minAmount);
       if (!isNaN(maxAmount)) filter.amount.$lte = Number(maxAmount);
     }
 
-    /* -----------------------------
-        DATE RANGE FILTER
-    ------------------------------ */
     if (dateRange) {
       let fromDate;
       const toDate = new Date();
@@ -403,29 +318,22 @@ export const getUserPayments = async (req, res) => {
       };
     }
 
-    /* -----------------------------
-        SORTING
-    ------------------------------ */
     const sortQuery = sort === "oldest" ? { createdAt: 1 } : { createdAt: -1 };
 
-    /* -----------------------------
-        FETCH PAYMENTS
-    ------------------------------ */
+
     const payments = await Payment.find(filter)
       .populate("orderId", "totalAmount status")
       .sort(sortQuery)
       .lean();
 
-    /* -----------------------------
-        RESPONSE
-    ------------------------------ */
-    return res.status(200).json({
+
+      return res.status(200).json({
       success: true,
       totalCount: payments.length,
       payments,
     });
   } catch (error) {
-    console.error("Get user payments error:", error);
+    console.error("error in getUserPayments payment.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch user payments",

@@ -6,12 +6,11 @@ function ImageUpload({ initialImage, onFileSelect }) {
 
   const [preview, setPreview] = useState(fallbackImage);
 
-  // Load initial image (edit mode)
+
   useEffect(() => {
     setPreview(initialImage || fallbackImage);
   }, [initialImage]);
 
-  // When user picks a file
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -29,7 +28,7 @@ function ImageUpload({ initialImage, onFileSelect }) {
           alt="Category"
           className="h-32 w-32 rounded-full object-cover shadow-md border-2 border-base-300"
           onError={(e) => {
-            e.target.src = fallbackImage; // fallback if broken URL
+            e.target.src = fallbackImage; 
           }}
         />
 

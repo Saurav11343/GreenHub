@@ -11,7 +11,6 @@ import {
 
 export const signup = async (req, res) => {
   try {
-    //validating using zod
     const validation = signupValidationSchema.safeParse(req.body);
 
     if (!validation.success) {
@@ -32,7 +31,6 @@ export const signup = async (req, res) => {
       roleName,
     } = validation.data;
 
-    //checking for existing user
     const existingUser = await User.findOne({ email });
     if (existingUser)
       return res.status(400).json({
@@ -49,11 +47,9 @@ export const signup = async (req, res) => {
     }
     const roleId = role._id;
 
-    //hashing password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    //creating new user
     const newUser = new User({
       firstName,
       lastName,
@@ -65,7 +61,6 @@ export const signup = async (req, res) => {
       roleId,
     });
 
-    //saving new user
     const savedUser = await newUser.save();
 
     // //generating jwt token
@@ -187,7 +182,7 @@ export const updateProfile = async (req, res) => {
 
     res.status(200).json(updateUser);
   } catch (error) {
-    console.log("Error in update profile", error);
+    console.log("Error in update profile auth.controller", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

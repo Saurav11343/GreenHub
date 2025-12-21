@@ -18,10 +18,6 @@ function CustomerPayments() {
 
   const [filters, setFilters] = useState({});
 
-  /* -----------------------------
-     FETCH USER PAYMENTS
-     (getUserPayments already resets state)
-  ------------------------------ */
   useEffect(() => {
     if (userId) {
       getUserPayments(userId, filters);

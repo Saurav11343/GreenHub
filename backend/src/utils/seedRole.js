@@ -12,7 +12,6 @@ export const seedRoles = async () => {
 
       if (!exists) {
         await Role.create(role);
-        // No console.log — silent insertion
       }
     }
   } catch (error) {

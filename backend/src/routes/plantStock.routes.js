@@ -9,8 +9,11 @@ import {
 const router = express.Router();
 
 router.get("/summary", getPlantStockSummary);
+
 router.get("/plants", getAllPlantStock);
+
 router.get("/low", getLowStockPlants);
+
 router.patch("/plants/:id", updatePlantStock);
 
 export default router;

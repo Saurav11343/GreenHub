@@ -5,7 +5,7 @@ export const useCategoryStore = create((set, get) => ({
   categories: [],
   loading: false,
   error: null,
-  message: null, // ✅ store backend message
+  message: null,
 
   getAllCategories: async () => {
     try {
@@ -18,7 +18,7 @@ export const useCategoryStore = create((set, get) => ({
           categories: res.data.data,
         });
       }
-      return res.data; // you can toast outside
+      return res.data;
     } catch (err) {
       const message = err.response?.data?.message || "Network error";
       set({ error: message });
@@ -39,7 +39,6 @@ export const useCategoryStore = create((set, get) => ({
           message: res.data.message,
         });
 
-        // Refresh categories after success
         await get().getAllCategories();
       } else {
         set({
@@ -68,7 +67,6 @@ export const useCategoryStore = create((set, get) => ({
           message: res.data.message,
         });
 
-        // refresh after delete
         await get().getAllCategories();
       } else {
         set({ error: res.data.message });
@@ -83,6 +81,7 @@ export const useCategoryStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+
   updateCategory: async (id, data) => {
     try {
       set({ loading: true, error: null, message: null });
@@ -94,7 +93,6 @@ export const useCategoryStore = create((set, get) => ({
           message: res.data.message,
         });
 
-        // Refresh category list after updating
         await get().getAllCategories();
       } else {
         set({
@@ -102,7 +100,7 @@ export const useCategoryStore = create((set, get) => ({
         });
       }
 
-      return res.data; // return for toast
+      return res.data;
     } catch (err) {
       const message = err.response?.data?.message || "Network error";
       set({ error: message });

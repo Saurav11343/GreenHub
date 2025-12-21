@@ -4,21 +4,22 @@ import { Search } from "lucide-react";
 function FormField({
   label,
   type = "text",
-  as = "input", // "input" | "textarea" | "search" | "select"
+  as = "input", // can be 'input', 'textarea', 'select', or 'search'
   register,
   registerName,
-  registerOptions = {}, // NEW: pass options like { valueAsNumber: true }
+  registerOptions = {}, 
   placeholder = "",
   error,
   rows = 4,
   icon,
-  children, // pull children explicitly
-  ...props // remaining props (do NOT include children here)
+  children, 
+  ...props 
 }) {
   const isSearch = as === "search";
 
   return (
     <div className="form-control w-full mb-3">
+     
       {/* Label */}
       {label && (
         <label className="label">

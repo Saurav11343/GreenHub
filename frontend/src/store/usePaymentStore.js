@@ -5,7 +5,6 @@ import { useCartStore } from "./useCartStore";
 export const usePaymentStore = create((set) => ({
   payments: [],
   totalCount: 0,
-
   loading: false,
   error: null,
   message: null,
@@ -70,22 +69,6 @@ export const usePaymentStore = create((set) => ({
       set({ loading: false });
     }
   },
-
-  // createOrder: async (amount) => {
-  //   const res = await axiosInstance.post("/payment/create-order", { amount });
-  //   return res.data;
-  // },
-
-  // savePayment: async (data) => {
-  //   const res = await axiosInstance.post("/payment/save", data);
-
-  //   if (res.data?.success) {
-  //     const { clearCartItem } = useCartStore.getState();
-  //     await clearCartItem(data.userId);
-  //   }
-
-  //   return res.data;
-  // },
 
   getAllPayments: async (filters = {}) => {
     try {

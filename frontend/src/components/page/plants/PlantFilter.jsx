@@ -121,7 +121,7 @@ export default function PlantFilter({
           </div>
 
           {/* CLEAR ALL BUTTON */}
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <button
               type="button"
               onClick={clearAllFilters}

@@ -30,7 +30,6 @@ function PlantCareUpdateForm({ readOnly = false }) {
     },
   });
 
-  /* ---------------- FETCH DATA ---------------- */
   useEffect(() => {
     if (plantId) {
       getPlantCareById(plantId);
@@ -38,7 +37,6 @@ function PlantCareUpdateForm({ readOnly = false }) {
     }
   }, [plantId, getPlantCareById, getPlantById]);
 
-  /* ---------------- PREFILL FORM ---------------- */
   useEffect(() => {
     if (plantCare?.careInstructions) {
       reset({
@@ -53,7 +51,6 @@ function PlantCareUpdateForm({ readOnly = false }) {
     }
   }, [plantCare, reset]);
 
-  /* ---------------- SUBMIT ---------------- */
   const onSubmit = async (data) => {
     const res = await updateCareInstructions(plantId, data);
 

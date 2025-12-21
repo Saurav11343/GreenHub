@@ -13,10 +13,9 @@ function AdminDashboard() {
 
   useEffect(() => {
     getAdminDashboardSummary();
-    getStockSummary(); // ✅ fetch inventory summary
+    getStockSummary();
   }, [getAdminDashboardSummary, getStockSummary]);
 
-  /* ---------------- LOADING STATE ---------------- */
   if (loading || !stockSummary) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
@@ -25,14 +24,12 @@ function AdminDashboard() {
     );
   }
 
-  /* ---------------- ERROR STATE ---------------- */
   if (error) {
     return (
       <div className="p-6 text-center text-red-500 font-medium">{error}</div>
     );
   }
 
-  /* ---------------- NO DATA ---------------- */
   if (!summary) return null;
 
   return (

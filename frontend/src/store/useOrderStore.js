@@ -4,16 +4,11 @@ import { axiosInstance } from "../lib/axios";
 export const useOrderStore = create((set) => ({
   orders: [],
   totalCount: 0,
-
   order: null,
-
   loading: false,
   error: null,
   message: null,
 
-  // =========================
-  // CREATE ORDER
-  // =========================
   createOrder: async (data) => {
     try {
       set({ loading: true, error: null, message: null });
@@ -43,9 +38,6 @@ export const useOrderStore = create((set) => ({
     }
   },
 
-  // =========================
-  // GET ORDER BY ID
-  // =========================
   getOrderById: async (orderId) => {
     try {
       set({ loading: true, error: null, message: null, order: null });
@@ -75,9 +67,6 @@ export const useOrderStore = create((set) => ({
     }
   },
 
-  // =========================
-  // ADMIN: GET ALL ORDERS
-  // =========================
   getAllOrders: async () => {
     try {
       set({ loading: true, error: null });
@@ -112,9 +101,6 @@ export const useOrderStore = create((set) => ({
     }
   },
 
-  // =========================
-  // USER: GET OWN ORDERS
-  // =========================
   getUserOrders: async (userId) => {
     try {
       set({
@@ -151,9 +137,6 @@ export const useOrderStore = create((set) => ({
     }
   },
 
-  // =========================
-  // CUSTOMER: CANCEL ORDER
-  // =========================
   cancelOrder: async (orderId) => {
     try {
       set({ loading: true, error: null, message: null });
@@ -180,9 +163,6 @@ export const useOrderStore = create((set) => ({
     }
   },
 
-  // =========================
-  // ADMIN: UPDATE ORDER STATUS
-  // =========================
   updateOrderStatus: async (orderId) => {
     try {
       set({ loading: true, error: null, message: null });
@@ -209,9 +189,6 @@ export const useOrderStore = create((set) => ({
     }
   },
 
-  // =========================
-  // OPTIONAL: CLEAR STORE
-  // =========================
   clearOrders: () =>
     set({
       orders: [],

@@ -13,7 +13,6 @@ function GlobalStats() {
     getStockSummary();
   }, [getAdminDashboardSummary, getStockSummary]);
 
-  /* ---------------- LOADING ---------------- */
   if (loading || !summary || !stockSummary) {
     return (
       <div className="flex justify-center py-12">

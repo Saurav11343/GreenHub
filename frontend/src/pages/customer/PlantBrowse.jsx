@@ -29,7 +29,6 @@ export default function PlantBrowse() {
 
   const navigate = useNavigate();
 
-  // run initial fetch once
   const didFetchRef = useRef(false);
   useEffect(() => {
     if (didFetchRef.current) return;
@@ -39,7 +38,6 @@ export default function PlantBrowse() {
     getAllPlants();
   }, [getAllCategories, getAllPlants]);
 
-  // clear client snapshot when store updates
   useEffect(() => {
     setFilteredPlants(null);
   }, [plants]);
@@ -55,7 +53,6 @@ export default function PlantBrowse() {
         const desc = (p.description || "").toString().toLowerCase();
         const matchesQ = q === "" || name.includes(q) || desc.includes(q);
 
-        // backend returns category as object: { _id, name }
         const pCategory = (
           p.categoryId?.name ||
           p.category ||
@@ -77,7 +74,6 @@ export default function PlantBrowse() {
     [plants]
   );
 
-  // purely client-side filter handler
   const handleFilter = useCallback(
     (filters) => {
       runClientFilter(filters);
@@ -85,7 +81,6 @@ export default function PlantBrowse() {
     [runClientFilter]
   );
 
-  // derive the selected category name (if any) from categories
   const selectedCategoryName = useMemo(() => {
     if (!categoryIdFromState || categories.length === 0) return "";
     const matched = categories.find(
@@ -94,20 +89,14 @@ export default function PlantBrowse() {
     return matched?.name || "";
   }, [categoryIdFromState, categories]);
 
-  // Apply the category filter automatically when we have a categoryId and category name
   useEffect(() => {
     if (!categoryIdFromState) return;
 
-    // if categories haven't loaded yet, wait (selectedCategoryName will update when categories arrive)
     if (!selectedCategoryName && categories.length === 0) return;
 
-    // apply filter using the category name (client-side objects store category as name)
     runClientFilter({ q: "", category: selectedCategoryName, maxPrice: 0 });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryIdFromState, selectedCategoryName, categories, runClientFilter]);
 
-  // default values for PlantFilter — pass category name so UI reflects selection.
-  // Use key to force remount of PlantFilter when selected category changes (so defaultValues are applied).
   const filterDefaultValues = useMemo(
     () => ({ q: "", category: selectedCategoryName || "", maxPrice: 1000 }),
     [selectedCategoryName]
@@ -118,7 +107,7 @@ export default function PlantBrowse() {
   return (
     <div className="p-4 max-w-full mx-auto">
       <PlantFilter
-        key={selectedCategoryName || "all"} // remounts when selection changes, applying defaultValues
+        key={selectedCategoryName || "all"}
         categories={categories}
         onFilter={handleFilter}
         defaultValues={filterDefaultValues}
@@ -141,7 +130,6 @@ export default function PlantBrowse() {
                 );
 
                 return (
-                  // wrapper with fixed height and hidden scrollbar
                   <div
                     key={p._id ?? p.id}
                     className="h-80 overflow-auto hide_scrollbar p-2"

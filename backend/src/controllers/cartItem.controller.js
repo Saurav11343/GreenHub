@@ -20,7 +20,6 @@ export const addToCart = async (req, res) => {
 
     const { userId, plantId, quantity = 1 } = validation.data;
 
-    // 1️⃣ Validate user
     const userExist = await User.findById(userId);
     if (!userExist) {
       return res.status(400).json({
@@ -29,7 +28,6 @@ export const addToCart = async (req, res) => {
       });
     }
 
-    // 2️⃣ Validate plant
     const plantExist = await Plant.findById(plantId);
     if (!plantExist) {
       return res.status(400).json({
@@ -38,13 +36,10 @@ export const addToCart = async (req, res) => {
       });
     }
 
-    // 3️⃣ Check existing cart item
     const existingItem = await CartItem.findOne({ userId, plantId });
 
-    // Calculate final quantity user wants in cart
     const finalQty = existingItem ? existingItem.quantity + quantity : quantity;
 
-    // 4️⃣ Validate stock (DO NOT DEDUCT)
     if (finalQty > plantExist.stockQty) {
       return res.status(400).json({
         success: false,
@@ -52,7 +47,6 @@ export const addToCart = async (req, res) => {
       });
     }
 
-    // 5️⃣ Update existing cart item
     if (existingItem) {
       existingItem.quantity = finalQty;
 
@@ -64,7 +58,6 @@ export const addToCart = async (req, res) => {
       });
     }
 
-    // 6️⃣ Create new cart item
     const newItem = await CartItem.create({
       userId,
       plantId,
@@ -77,7 +70,7 @@ export const addToCart = async (req, res) => {
       data: newItem,
     });
   } catch (error) {
-    console.log("Error in addToCart controller:", error);
+    console.log("Error in addToCart cartitem.controller :", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -114,7 +107,7 @@ export const getUserCart = async (req, res) => {
       data: cartItem,
     });
   } catch (error) {
-    console.log("Error in getUserCart controller:", error);
+    console.log("Error in getUserCart cartItem.controller:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -124,7 +117,6 @@ export const getUserCart = async (req, res) => {
 
 export const updateCartItem = async (req, res) => {
   try {
-    // 1️⃣ Validate cart item id
     const idValidation = cartItemIdSchema.safeParse(req.params);
     if (!idValidation.success) {
       return res.status(400).json({
@@ -135,7 +127,6 @@ export const updateCartItem = async (req, res) => {
 
     const { id } = idValidation.data;
 
-    // 2️⃣ Validate body
     const bodyValidation = updateCartItemSchema.safeParse(req.body);
     if (!bodyValidation.success) {
       return res.status(400).json({
@@ -146,7 +137,6 @@ export const updateCartItem = async (req, res) => {
 
     const { quantity } = bodyValidation.data;
 
-    // 3️⃣ Fetch cart item
     const cartItem = await CartItem.findById(id);
     if (!cartItem) {
       return res.status(404).json({
@@ -155,7 +145,6 @@ export const updateCartItem = async (req, res) => {
       });
     }
 
-    // 4️⃣ Fetch plant for stock validation
     const plant = await Plant.findById(cartItem.plantId);
     if (!plant) {
       return res.status(400).json({
@@ -164,7 +153,6 @@ export const updateCartItem = async (req, res) => {
       });
     }
 
-    // 5️⃣ Validate stock (NO deduction)
     if (quantity > plant.stockQty) {
       return res.status(400).json({
         success: false,
@@ -172,7 +160,6 @@ export const updateCartItem = async (req, res) => {
       });
     }
 
-    // Optional: if quantity is 0, remove item
     if (quantity <= 0) {
       await CartItem.findByIdAndDelete(id);
       return res.status(200).json({
@@ -181,7 +168,6 @@ export const updateCartItem = async (req, res) => {
       });
     }
 
-    // 6️⃣ Update cart quantity
     cartItem.quantity = quantity;
     const updatedItem = await cartItem.save();
 
@@ -191,7 +177,7 @@ export const updateCartItem = async (req, res) => {
       data: updatedItem,
     });
   } catch (error) {
-    console.log("Error in updateCartItem controller:", error);
+    console.log("Error in updateCartItem cartItem.controller:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -261,7 +247,7 @@ export const clearCart = async (req, res) => {
       deletedCount: result.deletedCount,
     });
   } catch (error) {
-    console.log("Error in clearCart controller:", error);
+    console.log("Error in clearCart cartItem.controller:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",

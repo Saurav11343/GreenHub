@@ -71,7 +71,7 @@ function OrderFilter({ filters, onChange, onReset }) {
           className="btn btn-outline btn-sm md:self-end"
           onClick={() => {
             onReset();
-            setOpen(false); // close on mobile after reset
+            setOpen(false); 
           }}
         >
           Reset

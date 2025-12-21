@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios";
 
 export const usePlantStore = create((set, get) => ({
   plants: [],
-  plant: null, //for getPlantbyId
+  plant: null,
   loading: false,
   error: null,
   message: null,
@@ -49,6 +49,7 @@ export const usePlantStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+
   createPlant: async (data) => {
     try {
       set({ loading: true, error: null, message: null });
@@ -60,7 +61,6 @@ export const usePlantStore = create((set, get) => ({
           message: res.data.message,
         });
 
-        // Refresh plant after success
         await get().getAllPlants();
       } else {
         set({
@@ -77,6 +77,7 @@ export const usePlantStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+
   deletePlant: async (id) => {
     try {
       set({ loading: true, error: null });
@@ -88,7 +89,6 @@ export const usePlantStore = create((set, get) => ({
           message: res.data.message,
         });
 
-        // refresh after delete
         await get().getAllPlants();
       } else {
         set({ error: res.data.message });
@@ -103,6 +103,7 @@ export const usePlantStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+
   updatePlant: async (id, data) => {
     try {
       set({ loading: true, error: null, message: null });
@@ -114,7 +115,6 @@ export const usePlantStore = create((set, get) => ({
           message: res.data.message,
         });
 
-        // Refresh plant list after updating
         await get().getAllPlants();
       } else {
         set({
@@ -122,7 +122,7 @@ export const usePlantStore = create((set, get) => ({
         });
       }
 
-      return res.data; // return for toast
+      return res.data;
     } catch (err) {
       const message = err.response?.data?.message || "Network error";
       set({ error: message });

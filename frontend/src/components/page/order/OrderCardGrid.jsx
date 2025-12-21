@@ -9,7 +9,6 @@ function OrderCardGrid({ orders, onRefresh }) {
 
   const { updateOrderStatus, cancelOrder } = useOrderStore();
 
-  /* ---------------- STATUS BADGE ---------------- */
   const getStatusBadge = (status) => {
     switch (status) {
       case "PaymentPending":
@@ -29,7 +28,6 @@ function OrderCardGrid({ orders, onRefresh }) {
     }
   };
 
-  /* ---------------- PERMISSION HELPERS ---------------- */
   const canCustomerCancel = (status) =>
     ["PaymentPending", "Confirmed"].includes(status);
 
@@ -39,7 +37,6 @@ function OrderCardGrid({ orders, onRefresh }) {
     return null;
   };
 
-  /* ---------------- HANDLERS ---------------- */
   const handleCancel = async (orderId) => {
     const res = await cancelOrder(orderId);
 
@@ -81,7 +78,6 @@ function OrderCardGrid({ orders, onRefresh }) {
             className="bg-base-100 border rounded-md shadow-sm hover:shadow-md transition"
           >
             <div className="p-3 flex flex-col gap-2 text-xs">
-              {/* ================= HEADER ================= */}
               <div className="flex justify-between items-start gap-2">
                 <div className="min-w-0">
                   <p className="font-semibold truncate">
@@ -101,7 +97,6 @@ function OrderCardGrid({ orders, onRefresh }) {
                 </span>
               </div>
 
-              {/* ================= META ================= */}
               <div className="flex justify-between text-[11px] text-gray-600">
                 <span>
                   <strong>ID:</strong>{" "}
@@ -112,13 +107,11 @@ function OrderCardGrid({ orders, onRefresh }) {
                 <span>{new Date(order.createdAt).toLocaleDateString()}</span>
               </div>
 
-              {/* ================= TOTAL ================= */}
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Total</span>
                 <span className="font-bold text-sm">₹{order.totalAmount}</span>
               </div>
 
-              {/* ================= ITEMS ================= */}
               <ul className="list-disc ml-4 space-y-0.5 text-[11px]">
                 {order.items?.map((item) => (
                   <li key={item._id} className="truncate">
@@ -127,9 +120,7 @@ function OrderCardGrid({ orders, onRefresh }) {
                 ))}
               </ul>
 
-              {/* ================= ACTIONS ================= */}
               <div className="flex justify-end gap-1 pt-1">
-                {/* CUSTOMER CANCEL */}
                 {role === "Customer" && canCustomerCancel(order.status) && (
                   <button
                     className="btn btn-xs btn-outline btn-error"
@@ -139,7 +130,6 @@ function OrderCardGrid({ orders, onRefresh }) {
                   </button>
                 )}
 
-                {/* ADMIN ACTION */}
                 {role === "Admin" && adminAction && (
                   <button
                     className="btn btn-xs btn-outline btn-primary"

@@ -15,7 +15,6 @@ function PaymentFilter({ onFilter }) {
     },
   });
 
-  // Remove empty / invalid values
   const cleanFilters = (data) =>
     Object.fromEntries(
       Object.entries(data).filter(
@@ -29,13 +28,13 @@ function PaymentFilter({ onFilter }) {
 
   const onSubmit = (data) => {
     onFilter(cleanFilters(data));
-    setIsOpen(false); // close after apply (mobile)
+    setIsOpen(false);
   };
 
   const resetFilters = () => {
     reset();
     onFilter();
-    setIsOpen(false); // close after reset (mobile)
+    setIsOpen(false);
   };
 
   return (

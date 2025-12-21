@@ -1,8 +1,5 @@
 import Plant from "../models/Plant.js";
 
-/* --------------------------------------------------
-   STOCK SUMMARY (already implemented)
--------------------------------------------------- */
 export const getPlantStockSummary = async (req, res) => {
   try {
     const totalPlants = await Plant.countDocuments();
@@ -17,7 +14,6 @@ export const getPlantStockSummary = async (req, res) => {
       stockQty: { $gt: 5 },
     });
 
-    // 🔹 TOTAL INVENTORY (sum of all stockQty)
     const inventoryAgg = await Plant.aggregate([
       {
         $group: {
@@ -32,15 +28,18 @@ export const getPlantStockSummary = async (req, res) => {
     return res.status(200).json({
       success: true,
       data: {
-        totalPlants, // number of plant records
-        totalInventory, // ✅ total units in inventory
+        totalPlants,
+        totalInventory,
         inStock,
         lowStock,
         outOfStock,
       },
     });
   } catch (error) {
-    console.error("Stock summary error:", error);
+    console.error(
+      "Error in getPlantStockSummary plantStock.controller:",
+      error
+    );
     return res.status(500).json({
       success: false,
       message: "Failed to fetch plant stock summary",
@@ -48,9 +47,6 @@ export const getPlantStockSummary = async (req, res) => {
   }
 };
 
-/* --------------------------------------------------
-   GET ALL PLANT STOCK (Admin Management)
--------------------------------------------------- */
 export const getAllPlantStock = async (req, res) => {
   try {
     const plants = await Plant.find()
@@ -63,7 +59,7 @@ export const getAllPlantStock = async (req, res) => {
       data: plants,
     });
   } catch (error) {
-    console.error("Get all stock error:", error);
+    console.error("Error in getAllPlantStock plantStock.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch plant stock list",
@@ -71,14 +67,10 @@ export const getAllPlantStock = async (req, res) => {
   }
 };
 
-/* --------------------------------------------------
-   GET LOW STOCK PLANTS (Optional)
--------------------------------------------------- */
 export const getLowStockPlants = async (req, res) => {
   try {
     const threshold = Number(req.query.threshold) || 5;
 
-    // Include out-of-stock (0) + low stock (<= threshold)
     const plants = await Plant.find({
       stockQty: { $lte: threshold },
     })
@@ -91,7 +83,7 @@ export const getLowStockPlants = async (req, res) => {
       data: plants,
     });
   } catch (error) {
-    console.error("Low stock error:", error);
+    console.error("Error in getLowStockPlants plantStock.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch low stock plants",
@@ -99,9 +91,6 @@ export const getLowStockPlants = async (req, res) => {
   }
 };
 
-/* --------------------------------------------------
-   UPDATE PLANT STOCK
--------------------------------------------------- */
 export const updatePlantStock = async (req, res) => {
   try {
     const { id } = req.params;
@@ -135,7 +124,7 @@ export const updatePlantStock = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Update stock error:", error);
+    console.error("Error in updatePlantStock plantStock.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to update plant stock",

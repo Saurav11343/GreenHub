@@ -35,7 +35,7 @@ function PlantStockDashboard() {
     if (res?.success) {
       toast.success("Stock updated successfully");
       setStockInputs((prev) => ({ ...prev, [id]: "" }));
-      getLowStockPlants(5); // refresh low stock list
+      getLowStockPlants(5);
     }
   };
 
@@ -78,10 +78,9 @@ function PlantStockDashboard() {
           value={stockSummary.outOfStock}
           color="error"
         />
-        
       </div>
 
-      {/* ================= MOBILE CARD VIEW ================= */}
+      {/* MOBILE CARD VIEW  */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
         {plantStocks.map((plant) => {
           const isOut = plant.stockQty === 0;
@@ -147,7 +146,7 @@ function PlantStockDashboard() {
         })}
       </div>
 
-      {/* ================= DESKTOP TABLE VIEW ================= */}
+      {/* DESKTOP TABLE VIEW */}
       <div className="border-2 rounded-lg bg-base-100 overflow-hidden hidden md:block">
         <h2 className="text-lg font-semibold p-4 border-b">Low Stock Plants</h2>
 

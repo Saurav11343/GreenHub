@@ -17,7 +17,6 @@ function ManagePlants() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  // PLANT STORE
   const {
     plants,
     loading: plantLoading,
@@ -27,46 +26,36 @@ function ManagePlants() {
     deletePlant,
   } = usePlantStore();
 
-  // CATEGORY STORE
   const {
     categories,
     loading: categoryLoading,
     getAllCategories,
   } = useCategoryStore();
 
-  // Load categories
   useEffect(() => {
     getAllCategories();
   }, []);
 
-  // Load plants
   useEffect(() => {
     getAllPlants();
   }, []);
 
-  // Search
   const plantsForUI = plants.map((p) => ({
     ...p,
-    // if categoryId is populated object, use its name; else fallback to empty string
     category:
       p?.categoryId && typeof p.categoryId === "object"
         ? p.categoryId.name ?? ""
-        : // if categoryId is string id, try to find name from categories store (assuming categories has objects)
-          (Array.isArray(categories) &&
+        : (Array.isArray(categories) &&
             categories.find((c) => (c._id ?? c.id) === p.categoryId)?.name) ||
           "",
   }));
 
-  // Search using the UI-ready field
   const filteredData = universalSearch(plantsForUI, searchQuery, [
     "name",
     "category",
     "description",
   ]);
 
-  /* -------------------------
-       MODAL OPENERS
-  -------------------------- */
   const openAddModal = () => {
     setFormType("add");
     setSelectedPlant(null);
@@ -84,9 +73,6 @@ function ManagePlants() {
     setIsDeleteOpen(true);
   };
 
-  /* -------------------------
-       FORM SUBMIT HANDLER
-  -------------------------- */
   const handleFormSubmit = async (data) => {
     let res;
 
@@ -106,9 +92,6 @@ function ManagePlants() {
     }
   };
 
-  /* -------------------------
-       DELETE HANDLER
-  -------------------------- */
   const handleDelete = async () => {
     const id = selectedPlant?._id ?? selectedPlant?.id;
     const res = await deletePlant(id);
@@ -122,9 +105,6 @@ function ManagePlants() {
     }
   };
 
-  /* -------------------------
-       LOADING STATE
-  -------------------------- */
   if (plantLoading || categoryLoading) return <PageLoader />;
 
   return (

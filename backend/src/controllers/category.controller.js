@@ -5,6 +5,7 @@ import {
 } from "../../../shared/validations/category.validation.js";
 import Category from "../models/Category.js";
 import cloudinary from "../lib/cloudinary.js";
+
 export const createCategory = async (req, res) => {
   try {
     const validation = createCategorySchema.safeParse(req.body);
@@ -38,7 +39,7 @@ export const createCategory = async (req, res) => {
       data: newCategory,
     });
   } catch (error) {
-    console.log("Error in createCategory controller: ", error);
+    console.log("Error in createCategory category.controller: ", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -56,7 +57,7 @@ export const getAllCategory = async (req, res) => {
       data: categories,
     });
   } catch (error) {
-    console.log("Error in getAllCategory controller", error);
+    console.log("Error in getAllCategory category.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -90,7 +91,7 @@ export const getCategoryById = async (req, res) => {
       data: category,
     });
   } catch (error) {
-    console.log("Error in getCategoryById controller: ", error);
+    console.log("Error in getCategoryById category.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
@@ -100,7 +101,6 @@ export const getCategoryById = async (req, res) => {
 
 export const updateCategory = async (req, res) => {
   try {
-    // 1️⃣ Validate category ID
     const idValidation = categoryIdSchema.safeParse(req.params);
     if (!idValidation.success) {
       return res.status(400).json({
@@ -111,7 +111,6 @@ export const updateCategory = async (req, res) => {
 
     const { id } = idValidation.data;
 
-    // 2️⃣ Validate body
     const bodyValidation = updateCategorySchema.safeParse(req.body);
     if (!bodyValidation.success) {
       return res.status(400).json({
@@ -122,7 +121,6 @@ export const updateCategory = async (req, res) => {
 
     const updateData = bodyValidation.data;
 
-    // 3️⃣ Check if category exists
     const category = await Category.findById(id);
     if (!category) {
       return res.status(404).json({
@@ -131,7 +129,6 @@ export const updateCategory = async (req, res) => {
       });
     }
 
-    // 4️⃣ Prevent duplicate names
     if (updateData.name) {
       const existing = await Category.findOne({ name: updateData.name });
       if (existing && existing._id.toString() !== id) {
@@ -142,28 +139,24 @@ export const updateCategory = async (req, res) => {
       }
     }
 
-    // 5️⃣ If a new image is provided → delete old one from Cloudinary
     if (updateData.imageUrl && updateData.imageUrl !== category.imageUrl) {
       try {
-        // Extract public_id from old image URL
         const urlParts = category.imageUrl.split("/");
-        const fileName = urlParts.pop(); // example: abcd123.png
-        const folder = urlParts.pop(); // example: categories
+        const fileName = urlParts.pop();
+        const folder = urlParts.pop();
 
-        const publicId = `${folder}/${fileName.split(".")[0]}`; // categories/abcd123
+        const publicId = `${folder}/${fileName.split(".")[0]}`;
 
-        // Delete old image
         const cloudRes = await cloudinary.uploader.destroy(publicId);
 
         if (cloudRes.result !== "ok" && cloudRes.result !== "not found") {
           console.log("Cloudinary deletion failed:", cloudRes);
         }
       } catch (err) {
-        console.log("❌ Error deleting old image from Cloudinary:", err);
+        console.log("Error deleting old image from Cloudinary:", err);
       }
     }
 
-    // 6️⃣ Update category
     const updatedCategory = await Category.findByIdAndUpdate(id, updateData, {
       new: true,
     });
@@ -174,7 +167,7 @@ export const updateCategory = async (req, res) => {
       data: updatedCategory,
     });
   } catch (error) {
-    console.log("❌ Error in updateCategory controller:", error);
+    console.log("Error in updateCategory category.controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error while updating category",
@@ -207,17 +200,16 @@ export const deleteCategory = async (req, res) => {
     try {
       if (category.imageUrl) {
         const urlParts = category.imageUrl.split("/");
-        const fileName = urlParts.pop(); // e.g. image123.jpg
-        const folder = urlParts.pop(); // e.g. categories
+        const fileName = urlParts.pop();
+        const folder = urlParts.pop();
 
-        const nameWithoutExt = fileName.split(".")[0]; // image123
-        publicId = `${folder}/${nameWithoutExt}`; // categories/image123
+        const nameWithoutExt = fileName.split(".")[0];
+        publicId = `${folder}/${nameWithoutExt}`;
       }
     } catch (err) {
-      console.log("❌ Failed to parse Cloudinary image URL:", err);
+      console.log("Failed to parse Cloudinary image URL:", err);
     }
 
-    // 4️⃣ Delete image from Cloudinary
     if (publicId) {
       try {
         const result = await cloudinary.uploader.destroy(publicId);
@@ -245,7 +237,7 @@ export const deleteCategory = async (req, res) => {
       message: "Category deleted successfully",
     });
   } catch (error) {
-    console.log("Error in deleteCategory controller: ", error);
+    console.log("Error in deleteCategory category.controller: ", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",

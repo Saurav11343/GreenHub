@@ -2,14 +2,12 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 
 export const usePlantCareStore = create((set) => ({
-  // ---------------- STATE ----------------
-  plantCareList: [], // all plants care tips
-  plantCare: null, // single plant care tips
+  plantCareList: [],
+  plantCare: null,
   loading: false,
   error: null,
   message: null,
 
-  // ---------------- GET ALL CARE TIPS ----------------
   getAllPlantCareTips: async () => {
     try {
       set({ loading: true, error: null });
@@ -34,7 +32,6 @@ export const usePlantCareStore = create((set) => ({
     }
   },
 
-  // ---------------- GET CARE TIPS BY PLANT ID ----------------
   getPlantCareById: async (plantId) => {
     try {
       set({
@@ -64,7 +61,6 @@ export const usePlantCareStore = create((set) => ({
     }
   },
 
-  // ---------------- UPDATE CARE INSTRUCTIONS ----------------
   updateCareInstructions: async (plantId, payload) => {
     try {
       set({ loading: true, error: null, message: null });
@@ -97,7 +93,6 @@ export const usePlantCareStore = create((set) => ({
     }
   },
 
-  // ---------------- CLEAR STATE ----------------
   clearPlantCare: () =>
     set({
       plantCare: null,
