@@ -4,7 +4,7 @@ import { useCartStore } from "../../store/useCartStore";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createOrderSchema } from "../../../../shared/validations/order.validation";
+import { createOrderSchema } from "../../shared/validations/order.validation";
 import FormField from "../../components/common/FormField";
 import PageLoader from "../../components/loader/PageLoader";
 import toast from "react-hot-toast";
@@ -132,7 +132,7 @@ function CheckOut() {
     }).format(value);
 
   const hasStockIssue = cartItems.some(
-    (item) => quantities[item._id] > getStockForItem(item)
+    (item) => quantities[item._id] > getStockForItem(item),
   );
 
   const onSubmit = async (data) => {

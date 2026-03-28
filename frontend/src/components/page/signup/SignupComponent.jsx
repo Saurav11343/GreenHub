@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signupValidationSchema } from "../../../../../shared/validations/user.validation.js";
+import { signupValidationSchema } from "../../../shared/validations/user.validation.js";
 import { useAuthStore } from "../../../store/useAuthStore.js";
 
 import InputField from "../../common/InputField.jsx";

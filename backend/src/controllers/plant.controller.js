@@ -4,8 +4,8 @@ import {
   createPlantSchema,
   plantIdSchema,
   updatePlantSchema,
-} from "../../../shared/validations/plant.validation.js";
-import { categoryIdSchema } from "../../../shared/validations/category.validation.js";
+} from "../shared/validations/plant.validation.js";
+import { categoryIdSchema } from "../shared/validations/category.validation.js";
 
 import cloudinary from "../lib/cloudinary.js";
 
@@ -296,7 +296,7 @@ export const getPlantByCategory = async (req, res) => {
 
     const plants = await Plant.find({ categoryId: id }).populate(
       "categoryId",
-      "name"
+      "name",
     );
 
     return res.status(200).json({
@@ -361,7 +361,7 @@ export const updateCareInstructions = async (req, res) => {
     const updatedPlant = await Plant.findByIdAndUpdate(
       plantId,
       { $set: setObj },
-      { new: true }
+      { new: true },
     );
 
     return res.status(200).json({
@@ -385,7 +385,7 @@ export const getAllPlantCareTips = async (req, res) => {
       {
         name: 1,
         careInstructions: 1,
-      }
+      },
     );
 
     return res.status(200).json({

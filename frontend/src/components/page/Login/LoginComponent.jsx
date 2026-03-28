@@ -5,7 +5,7 @@ import { useAuthStore } from "../../../store/useAuthStore.js";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginValidationSchema } from "../../../../../shared/validations/user.validation.js";
+import { loginValidationSchema } from "../../../shared/validations/user.validation.js";
 import FormField from "../../common/FormField.jsx";
 import toast from "react-hot-toast";
 

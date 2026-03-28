@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import FormField from "../../common/FormField.jsx";
-import { createPlantSchema } from "../../../../../shared/validations/plant.validation.js";
+import { createPlantSchema } from "../../../shared/validations/plant.validation.js";
 import { useUploadStore } from "../../../store/useUploadStore.js";
 import { useImageCompression } from "../../../utils/useImageCompression.js";
 import ButtonLoader from "../../common/ButtonLoader.jsx";
@@ -53,7 +53,7 @@ function PlantFormModal({
           name: c.name ?? String(c._id ?? c),
         };
       }),
-    [categories]
+    [categories],
   );
 
   const resolveInitialCategoryId = (initial) => {
@@ -66,7 +66,7 @@ function PlantFormModal({
     const name = initial.category ?? initial.categoryName ?? "";
     if (name) {
       const found = normalizedCategories.find(
-        (nc) => String(nc.name).toLowerCase() === String(name).toLowerCase()
+        (nc) => String(nc.name).toLowerCase() === String(name).toLowerCase(),
       );
       if (found) return found.id;
     }
@@ -82,14 +82,14 @@ function PlantFormModal({
           typeof initialData.price === "number"
             ? initialData.price
             : initialData.price
-            ? Number(initialData.price)
-            : undefined,
+              ? Number(initialData.price)
+              : undefined,
         stockQty:
           typeof initialData.stockQty === "number"
             ? initialData.stockQty
             : initialData.stockQty
-            ? Number(initialData.stockQty)
-            : undefined,
+              ? Number(initialData.stockQty)
+              : undefined,
         description: initialData.description ?? "",
         imageUrl: initialData.imageUrl ?? "",
       });
@@ -117,15 +117,15 @@ function PlantFormModal({
         typeof formData.price === "number"
           ? formData.price
           : formData.price === "" || formData.price == null
-          ? 0
-          : Number(formData.price);
+            ? 0
+            : Number(formData.price);
 
       formData.stockQty =
         typeof formData.stockQty === "number"
           ? formData.stockQty
           : formData.stockQty === "" || formData.stockQty == null
-          ? 0
-          : Number(formData.stockQty);
+            ? 0
+            : Number(formData.stockQty);
 
       if (
         typeof formData.categoryId === "object" &&

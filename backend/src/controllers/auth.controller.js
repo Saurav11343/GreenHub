@@ -7,7 +7,7 @@ import Role from "../models/Role.js";
 import {
   loginValidationSchema,
   signupValidationSchema,
-} from "../../../shared/validations/user.validation.js";
+} from "../shared/validations/user.validation.js";
 
 export const signup = async (req, res) => {
   try {
@@ -177,7 +177,7 @@ export const updateProfile = async (req, res) => {
     const updateUser = await User.findByIdAndUpdate(
       userId,
       { profilePic: uploadResponse.secure_url },
-      { new: true }
+      { new: true },
     );
 
     res.status(200).json(updateUser);

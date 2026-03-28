@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import FormField from "../../common/FormField.jsx";
-import { createCategorySchema } from "../../../../../shared/validations/category.validation.js";
+import { createCategorySchema } from "../../../shared/validations/category.validation.js";
 import { useUploadStore } from "../../../store/useUploadStore.js";
 import { useImageCompression } from "../../../utils/useImageCompression.js";
 import ButtonLoader from "../../common/ButtonLoader.jsx";
@@ -32,7 +32,6 @@ function CategoryFormModal({ isOpen, onClose, onSubmit, initialData, type }) {
   const [previewImg, setPreviewImg] = useState(null);
   const [saving, setSaving] = useState(false);
 
-
   useEffect(() => {
     if (initialData) {
       reset({
@@ -48,7 +47,6 @@ function CategoryFormModal({ isOpen, onClose, onSubmit, initialData, type }) {
   }, [initialData, reset]);
 
   if (!isOpen) return null;
-
 
   const handleFinalSubmit = async (formData) => {
     setSaving(true);

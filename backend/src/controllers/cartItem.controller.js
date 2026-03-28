@@ -6,7 +6,7 @@ import {
   updateCartItemSchema,
   cartItemIdSchema,
   userIdSchema,
-} from "../../../shared/validations/cartItem.validation.js";
+} from "../shared/validations/cartItem.validation.js";
 
 export const addToCart = async (req, res) => {
   try {

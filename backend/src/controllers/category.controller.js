@@ -2,7 +2,7 @@ import {
   createCategorySchema,
   updateCategorySchema,
   categoryIdSchema,
-} from "../../../shared/validations/category.validation.js";
+} from "../shared/validations/category.validation.js";
 import Category from "../models/Category.js";
 import cloudinary from "../lib/cloudinary.js";
 

@@ -8,7 +8,7 @@ import {
   updateOrderStatusSchema,
   orderIdSchema,
   userIdSchema,
-} from "../../../shared/validations/order.validation.js";
+} from "../shared/validations/order.validation.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -32,7 +32,7 @@ export const createOrder = async (req, res) => {
 
     const cartItems = await CartItem.find({ userId }).populate(
       "plantId",
-      "price name stockQty"
+      "price name stockQty",
     );
 
     if (!cartItems.length) {
@@ -128,7 +128,7 @@ export const getUserOrders = async (req, res) => {
     const ordersWithDetails = orders.map((order) => ({
       ...order,
       items: details.filter(
-        (d) => d.orderId.toString() === order._id.toString()
+        (d) => d.orderId.toString() === order._id.toString(),
       ),
     }));
 
@@ -168,7 +168,7 @@ export const getOrderById = async (req, res) => {
 
     const orderDetails = await OrderDetail.find({ orderId }).populate(
       "plantId",
-      "name price imageUrl"
+      "name price imageUrl",
     );
 
     const orderWithItems = {
@@ -266,7 +266,7 @@ export const cancelOrder = async (req, res) => {
 
     if (
       ["Shipped", "Delivered", "Cancelled", "PaymentFailed"].includes(
-        order.status
+        order.status,
       )
     ) {
       return res.status(400).json({
@@ -319,7 +319,7 @@ export const getAllOrders = async (req, res) => {
     const ordersWithDetails = orders.map((order) => ({
       ...order,
       items: details.filter(
-        (d) => d.orderId.toString() === order._id.toString()
+        (d) => d.orderId.toString() === order._id.toString(),
       ),
     }));
 
